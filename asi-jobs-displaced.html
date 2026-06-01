@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASI Deployment — Job Displacement Model USA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #FF3B30;
+    --orange: #FF9500;
+    --blue: #0A84FF;
+    --purple: #BF5AF2;
+    --bg: #0A0A0F;
+    --surface: #13131A;
+    --surface2: #1C1C26;
+    --border: #2A2A38;
+    --text: #F0F0F5;
+    --text2: #8888AA;
+    --text3: #4A4A66;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 2rem 1.5rem 4rem; }
+
+  .header { max-width: 960px; margin: 0 auto 2rem; }
+  .header-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--red); margin-bottom: .5rem; }
+  h1 { font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 600; line-height: 1.2; margin-bottom: .4rem; }
+  .header-sub { font-size: 12px; color: var(--text2); font-weight: 300; line-height: 1.6; }
+  .asi-note { display: inline-block; margin-top: .6rem; background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.3); border-radius: 4px; padding: 6px 12px; font-size: 11px; color: var(--red); font-family: 'Space Mono', monospace; }
+
+  .stats-row { max-width: 960px; margin: 0 auto 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .stat { background: var(--surface); padding: .9rem 1.1rem; }
+  .stat-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: .3rem; }
+  .stat-value { font-family: 'Space Mono', monospace; font-size: 1.4rem; font-weight: 700; color: var(--red); }
+  .stat-sub { font-size: 10px; color: var(--text3); margin-top: .2rem; }
+
+  .tabs { max-width: 960px; margin: 0 auto 1rem; display: flex; gap: 4px; flex-wrap: wrap; }
+  .tab { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; padding: 5px 12px; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; }
+  .tab:hover { color: var(--text2); border-color: var(--text3); }
+  .tab.t-all.active { background: var(--red); border-color: var(--red); color: #fff; }
+  .tab.t-immediate.active { background: rgba(255,59,48,.15); border-color: var(--red); color: var(--red); }
+  .tab.t-fast.active { background: rgba(255,149,0,.15); border-color: var(--orange); color: var(--orange); }
+  .tab.t-moderate.active { background: rgba(10,132,255,.15); border-color: var(--blue); color: var(--blue); }
+  .tab.t-robot.active { background: rgba(191,90,242,.15); border-color: var(--purple); color: var(--purple); }
+
+  .legend { max-width: 960px; margin: 0 auto 1.5rem; display: flex; flex-wrap: wrap; gap: 1.2rem; }
+  .leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  .content { max-width: 960px; margin: 0 auto; }
+  .sector { background: var(--surface); border-radius: 6px; border: 1px solid var(--border); margin-bottom: .9rem; overflow: hidden; }
+  .sector-hdr { background: var(--surface2); padding: .55rem 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+  .sector-name { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); }
+  .sector-tot { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--red); }
+
+  .job-row { display: flex; align-items: center; gap: 8px; padding: 6px 1rem; border-bottom: 1px solid var(--border); transition: background .1s; animation: fadeIn .25s ease both; }
+  .job-row:last-child { border-bottom: none; }
+  .job-row:hover { background: var(--surface2); }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:translateY(0); } }
+
+  .job-name { flex: 1; font-size: 12px; color: var(--text); min-width: 0; line-height: 1.3; }
+  .badge { font-family: 'Space Mono', monospace; font-size: 8.5px; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; letter-spacing: .03em; white-space: nowrap; }
+  .badge-immediate { background: rgba(255,59,48,.12); color: var(--red); border: 1px solid rgba(255,59,48,.25); }
+  .badge-fast { background: rgba(255,149,0,.12); color: var(--orange); border: 1px solid rgba(255,149,0,.25); }
+  .badge-moderate { background: rgba(10,132,255,.12); color: var(--blue); border: 1px solid rgba(10,132,255,.25); }
+  .badge-robot { background: rgba(191,90,242,.12); color: var(--purple); border: 1px solid rgba(191,90,242,.25); }
+
+  .bar-wrap { width: 64px; flex-shrink: 0; }
+  .bar-bg { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; transition: width .4s ease; }
+  .bar-immediate { background: var(--red); }
+  .bar-fast { background: var(--orange); }
+  .bar-moderate { background: var(--blue); }
+  .bar-robot { background: var(--purple); }
+
+  .job-pct { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text2); min-width: 30px; text-align: right; flex-shrink: 0; }
+  .job-lost { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--red); min-width: 44px; text-align: right; flex-shrink: 0; }
+
+  .note { max-width: 960px; margin: 1.5rem auto 0; font-size: 11px; color: var(--text3); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 1rem; }
+  .note b { color: var(--text2); }
+
+  @media (max-width:480px) { .bar-wrap { display:none; } .job-name { font-size: 11px; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">ASI Deployment Model — USA</div>
+  <h1>Job Displacement After ASI Public Release</h1>
+  <p class="header-sub">AGI and ASI are one event. By the time a public announcement is made, ASI already exists internally. This chart models displacement from ASI deployment day — not AGI. Timelines are compressed accordingly. Humanoid robot wave included as second displacement layer.</p>
+  <span class="asi-note">⚡ "AGI release" = ASI already exists. The gap is hours, not months.</span>
+</div>
+
+<div class="stats-row">
+  <div class="stat"><div class="stat-label">Wave 1 Direct</div><div class="stat-value" id="s-w1">—</div><div class="stat-sub">software displacement</div></div>
+  <div class="stat"><div class="stat-label">Wave 2 Direct</div><div class="stat-value" id="s-w2">—</div><div class="stat-sub">humanoid robot wave</div></div>
+  <div class="stat"><div class="stat-label">Total Direct</div><div class="stat-value" id="s-total">—</div><div class="stat-sub">combined both waves</div></div>
+  <div class="stat"><div class="stat-label">With Multiplier</div><div class="stat-value" id="s-multi">—</div><div class="stat-sub">×1.55 indirect</div></div>
+  <div class="stat"><div class="stat-label">% Workforce</div><div class="stat-value" id="s-pct">—</div><div class="stat-sub">160M baseline</div></div>
+  <div class="stat"><div class="stat-label">Day 1–30</div><div class="stat-value" id="s-imm">—</div><div class="stat-sub">immediate ASI layer</div></div>
+</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:#FF3B30"></div>Immediate — Day 1–30</div>
+  <div class="leg"><div class="leg-dot" style="background:#FF9500"></div>Fast — Month 1–4</div>
+  <div class="leg"><div class="leg-dot" style="background:#0A84FF"></div>Moderate — Month 4–9</div>
+  <div class="leg"><div class="leg-dot" style="background:#BF5AF2"></div>Robot Wave — Month 6–18</div>
+</div>
+
+<div class="tabs">
+  <button class="tab t-all active" onclick="setFilter('all',this)">All waves</button>
+  <button class="tab t-immediate" onclick="setFilter('immediate',this)">Immediate</button>
+  <button class="tab t-fast" onclick="setFilter('fast',this)">Fast</button>
+  <button class="tab t-moderate" onclick="setFilter('moderate',this)">Moderate</button>
+  <button class="tab t-robot" onclick="setFilter('robot',this)">Robot wave</button>
+</div>
+
+<div class="content" id="content"></div>
+<div class="note" id="note"></div>
+
+<script>
+const sectors = [
+  {
+    name: "Knowledge Work & Office",
+    jobs: [
+      {n:"Data entry & processing clerks",lost:3.8,pct:97,speed:"immediate"},
+      {n:"Customer service representatives",lost:2.9,pct:95,speed:"immediate"},
+      {n:"Administrative assistants",lost:3.4,pct:91,speed:"immediate"},
+      {n:"Bookkeeping & accounting clerks",lost:2.1,pct:93,speed:"immediate"},
+      {n:"Payroll clerks",lost:0.6,pct:96,speed:"immediate"},
+      {n:"HR generalists & recruiters",lost:1.4,pct:91,speed:"immediate"},
+      {n:"Paralegals & legal assistants",lost:0.4,pct:94,speed:"immediate"},
+      {n:"Medical billing & coders",lost:0.5,pct:92,speed:"immediate"},
+      {n:"Insurance claims processors",lost:0.7,pct:90,speed:"immediate"},
+      {n:"Financial analysts",lost:1.2,pct:86,speed:"fast"},
+      {n:"Loan officers & underwriters",lost:0.5,pct:88,speed:"fast"},
+      {n:"Market research analysts",lost:0.5,pct:86,speed:"fast"},
+      {n:"Compliance officers",lost:0.3,pct:81,speed:"fast"},
+    ]
+  },
+  {
+    name: "Software & Tech",
+    jobs: [
+      {n:"Junior & mid-level software developers",lost:2.1,pct:90,speed:"immediate"},
+      {n:"QA testers & manual reviewers",lost:0.4,pct:98,speed:"immediate"},
+      {n:"Data analysts",lost:0.8,pct:91,speed:"immediate"},
+      {n:"IT support & helpdesk",lost:0.9,pct:87,speed:"fast"},
+      {n:"Network administrators",lost:0.3,pct:74,speed:"fast"},
+      {n:"Senior software engineers",lost:0.9,pct:65,speed:"fast"},
+      {n:"DevOps engineers",lost:0.3,pct:66,speed:"fast"},
+      {n:"Cybersecurity analysts",lost:0.2,pct:51,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Media, Content & Marketing",
+    jobs: [
+      {n:"Copywriters & content writers",lost:0.7,pct:96,speed:"immediate"},
+      {n:"Graphic designers (commercial)",lost:0.5,pct:91,speed:"immediate"},
+      {n:"Social media managers",lost:0.3,pct:88,speed:"immediate"},
+      {n:"SEO specialists",lost:0.15,pct:94,speed:"immediate"},
+      {n:"Translators & interpreters",lost:0.15,pct:85,speed:"immediate"},
+      {n:"Journalists & reporters",lost:0.2,pct:84,speed:"fast"},
+      {n:"Video editors (routine)",lost:0.2,pct:82,speed:"fast"},
+      {n:"Ad buyers & campaign managers",lost:0.2,pct:79,speed:"fast"},
+    ]
+  },
+  {
+    name: "Finance & Banking",
+    jobs: [
+      {n:"Bank tellers",lost:0.3,pct:92,speed:"immediate"},
+      {n:"Tax preparers",lost:0.3,pct:95,speed:"immediate"},
+      {n:"Accountants & auditors",lost:1.1,pct:87,speed:"fast"},
+      {n:"Financial advisors (mass market)",lost:0.4,pct:80,speed:"fast"},
+      {n:"Insurance agents (standard lines)",lost:0.4,pct:77,speed:"fast"},
+      {n:"Stock & commodities traders",lost:0.15,pct:72,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Food Service & Hospitality",
+    jobs: [
+      {n:"Hotel front desk & reservations",lost:0.5,pct:82,speed:"immediate"},
+      {n:"Fast food & counter service workers",lost:3.2,pct:84,speed:"fast"},
+      {n:"Chain restaurant line cooks",lost:1.4,pct:77,speed:"fast"},
+      {n:"Casual dining waitstaff (chain)",lost:2.1,pct:71,speed:"fast"},
+      {n:"Bartenders (chain/volume)",lost:0.4,pct:58,speed:"moderate"},
+      {n:"Fine dining waitstaff",lost:0.1,pct:19,speed:"moderate"},
+      {n:"Artisan & creative chefs",lost:0.05,pct:9,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Healthcare (Cognitive Roles)",
+    jobs: [
+      {n:"Medical transcriptionists",lost:0.08,pct:98,speed:"immediate"},
+      {n:"Clinical documentation specialists",lost:0.1,pct:95,speed:"immediate"},
+      {n:"Radiologists & diagnostic imaging",lost:0.18,pct:88,speed:"fast"},
+      {n:"Pathologists",lost:0.06,pct:82,speed:"fast"},
+      {n:"Pharmacy technicians (dispensing)",lost:0.2,pct:74,speed:"fast"},
+      {n:"Pharmacists (dispensing function)",lost:0.15,pct:56,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Legal & Professional Services",
+    jobs: [
+      {n:"Document review lawyers",lost:0.15,pct:94,speed:"immediate"},
+      {n:"Legal researchers",lost:0.1,pct:91,speed:"immediate"},
+      {n:"Management consultants (junior)",lost:0.3,pct:85,speed:"fast"},
+      {n:"Architects (routine drafting)",lost:0.12,pct:77,speed:"fast"},
+      {n:"Civil engineers (routine analysis)",lost:0.15,pct:64,speed:"moderate"},
+      {n:"Dentists (routine cleaning & basic)",lost:0.1,pct:46,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Education & Training",
+    jobs: [
+      {n:"Test prep & tutoring",lost:0.25,pct:91,speed:"immediate"},
+      {n:"Online course instructors",lost:0.4,pct:89,speed:"fast"},
+      {n:"Corporate trainers",lost:0.3,pct:86,speed:"fast"},
+      {n:"K-12 teachers (standardized content)",lost:0.5,pct:34,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Retail & Customer-Facing",
+    jobs: [
+      {n:"Call center agents",lost:1.4,pct:94,speed:"immediate"},
+      {n:"Cashiers & checkout staff",lost:1.8,pct:76,speed:"fast"},
+      {n:"Sales representatives (inside)",lost:0.9,pct:81,speed:"fast"},
+      {n:"Travel agents",lost:0.06,pct:90,speed:"fast"},
+      {n:"Real estate agents (standard)",lost:0.3,pct:64,speed:"moderate"},
+      {n:"Property managers (routine)",lost:0.2,pct:61,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Logistics & Transport",
+    jobs: [
+      {n:"Dispatchers & logistics coordinators",lost:0.4,pct:89,speed:"immediate"},
+      {n:"Warehouse order pickers (non-robotic)",lost:0.9,pct:58,speed:"fast"},
+      {n:"Truck & delivery drivers",lost:1.2,pct:36,speed:"moderate"},
+      {n:"Postal & mail workers",lost:0.2,pct:51,speed:"moderate"},
+      {n:"Airline pilots (regulatory delay)",lost:0.1,pct:24,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Government & Public Sector",
+    jobs: [
+      {n:"Government administrative clerks",lost:1.1,pct:82,speed:"fast"},
+      {n:"DMV & permit processors",lost:0.2,pct:91,speed:"fast"},
+      {n:"Tax & revenue agents",lost:0.15,pct:84,speed:"fast"},
+      {n:"Benefits & welfare case workers",lost:0.4,pct:75,speed:"moderate"},
+    ]
+  },
+  {
+    name: "Personal Services & Wellness",
+    jobs: [
+      {n:"Personal trainers (programming only)",lost:0.2,pct:73,speed:"fast"},
+      {n:"Security guards (monitoring roles)",lost:0.6,pct:69,speed:"fast"},
+      {n:"Life & career coaches",lost:0.15,pct:65,speed:"fast"},
+      {n:"Financial planners (basic)",lost:0.2,pct:71,speed:"fast"},
+      {n:"Veterinarians (diagnostic function)",lost:0.08,pct:51,speed:"moderate"},
+    ]
+  },
+  {
+    name: "🤖 Humanoid Robot Wave — Month 6–18",
+    jobs: [
+      {n:"Janitors & commercial cleaners",lost:2.8,pct:72,speed:"robot"},
+      {n:"Home health aides & personal care",lost:3.1,pct:61,speed:"robot"},
+      {n:"Agricultural & farm workers",lost:2.4,pct:58,speed:"robot"},
+      {n:"Construction laborers (routine)",lost:2.2,pct:49,speed:"robot"},
+      {n:"Manufacturing assembly workers",lost:2.6,pct:66,speed:"robot"},
+      {n:"Retail stock & shelf workers",lost:1.4,pct:71,speed:"robot"},
+      {n:"Package handlers (FedEx/UPS/Amazon)",lost:1.2,pct:63,speed:"robot"},
+      {n:"Laundry & dry cleaning workers",lost:0.3,pct:77,speed:"robot"},
+      {n:"Grounds maintenance & landscaping",lost:0.9,pct:54,speed:"robot"},
+      {n:"Moving & heavy labor crews",lost:0.4,pct:58,speed:"robot"},
+    ]
+  }
+];
+
+let filter = 'all';
+
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function render() {
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+  let w1 = 0, w2 = 0, imm = 0;
+
+  sectors.forEach(sector => {
+    const jobs = filter === 'all' ? sector.jobs : sector.jobs.filter(j => j.speed === filter);
+    if (!jobs.length) return;
+
+    const tot = jobs.reduce((a,j) => a + j.lost, 0);
+    jobs.forEach(j => {
+      if (j.speed === 'robot') w2 += j.lost;
+      else w1 += j.lost;
+      if (j.speed === 'immediate') imm += j.lost;
+    });
+
+    const div = document.createElement('div');
+    div.className = 'sector';
+    let html = `<div class="sector-hdr"><span class="sector-name">${sector.name}</span><span class="sector-tot">${tot.toFixed(1)}M</span></div>`;
+
+    jobs.forEach((j, i) => {
+      const labels = {immediate:'Day 1–30', fast:'Mo 1–4', moderate:'Mo 4–9', robot:'Mo 6–18 🤖'};
+      const barW = Math.min(Math.round(j.lost / 4 * 100), 100);
+      html += `<div class="job-row" style="animation-delay:${i*25}ms">
+        <span class="job-name">${j.n}</span>
+        <span class="badge badge-${j.speed}">${labels[j.speed]}</span>
+        <div class="bar-wrap"><div class="bar-bg"><div class="bar-fill bar-${j.speed}" style="width:${barW}%"></div></div></div>
+        <span class="job-pct">${j.pct}%</span>
+        <span class="job-lost">${j.lost.toFixed(1)}M</span>
+      </div>`;
+    });
+
+    div.innerHTML = html;
+    content.appendChild(div);
+  });
+
+  const total = w1 + w2;
+  const multi = total * 1.55;
+  const pct = (total / 160 * 100);
+
+  document.getElementById('s-w1').textContent = w1.toFixed(1) + 'M';
+  document.getElementById('s-w2').textContent = w2.toFixed(1) + 'M';
+  document.getElementById('s-total').textContent = total.toFixed(1) + 'M';
+  document.getElementById('s-multi').textContent = multi.toFixed(1) + 'M';
+  document.getElementById('s-pct').textContent = pct.toFixed(0) + '%';
+  document.getElementById('s-imm').textContent = imm.toFixed(1) + 'M';
+
+  document.getElementById('note').innerHTML = `
+    <b>Key reframes vs AGI chart:</b> (1) Timelines compressed — ASI is deployed at full capability day one, no ramp up. (2) Immediate window shrinks from 90 days to 30 days — contract non-renewals happen faster when the capability gap is unambiguous. (3) Senior software engineers moved to Fast — ASI makes even senior devs redundant faster than AGI would. (4) Humanoid robot wave added as separate layer — ASI directs robotic deployment simultaneously, accelerating physical job displacement into the 6–18 month window rather than 2–3 years. (5) <b>This chart does not model jobs that survive</b> — officiating, coaching, physical presence roles, creative arts, genuine human connection work. Those compress in supply and increase in value. <br><br>Multiplier ×1.55 captures indirect losses from consumer spending collapse and supply chain contraction. 160M workforce baseline.
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
