@@ -79,6 +79,28 @@
   .note { max-width: 960px; margin: 1.5rem auto 0; font-size: 11px; color: var(--text3); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 1rem; }
   .note b { color: var(--text2); }
 
+  /* ── Chart section ── */
+  .section-divider { max-width: 960px; margin: 3rem auto 2rem; display: flex; align-items: center; gap: 1rem; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--text3); white-space: nowrap; }
+
+  .chart-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  .chart-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: .3rem; }
+  .chart-subtitle { font-size: 11px; color: #6666AA; margin-bottom: 1.2rem; line-height: 1.5; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 1rem; font-size: 11px; color: #8888AA; }
+  .chart-leg { display: flex; align-items: center; gap: 5px; }
+  .chart-leg-line { width: 18px; height: 3px; border-radius: 2px; }
+  .chart-leg-line.dashed { background: repeating-linear-gradient(90deg, #378ADD 0px, #378ADD 4px, transparent 4px, transparent 8px); height: 2px; }
+  .canvas-container { position: relative; width: 100%; height: 400px; }
+  .chart-note { font-size: 10px; color: var(--text3); margin-top: .9rem; font-style: italic; line-height: 1.6; border-top: 1px solid var(--surface2); padding-top: .8rem; }
+
   @media (max-width:480px) { .bar-wrap { display:none; } .job-name { font-size: 11px; } }
 </style>
 </head>
@@ -118,7 +140,33 @@
 <div class="content" id="content"></div>
 <div class="note" id="note"></div>
 
+<!-- ── Divider ── -->
+<div class="section-divider">
+  <div class="section-divider-line"></div>
+  <div class="section-divider-label">Macro context — the four lines</div>
+  <div class="section-divider-line"></div>
+</div>
+
+<!-- ── Capability chart ── -->
+<div class="chart-wrapper">
+  <div class="chart-title">AGI → ASI: The Four Lines That Explain Everything</div>
+  <div class="chart-subtitle">AI capability exits measurable scale at the singularity point. The other three lines remain human-scale — that contrast is the point.</div>
+  <div class="chart-legend">
+    <div class="chart-leg"><div class="chart-leg-line" style="background:#1D9E75"></div>AI Capability (exits chart at ASI)</div>
+    <div class="chart-leg"><div class="chart-leg-line dashed"></div>AI Cost to Use (lower = cheaper)</div>
+    <div class="chart-leg"><div class="chart-leg-line" style="background:#E24B4A"></div>Unemployment %</div>
+    <div class="chart-leg"><div class="chart-leg-line" style="background:#F472B6; height:2px; border-top:2px dotted #F472B6; background:none;"></div>GDP Growth % YoY</div>
+  </div>
+  <div class="canvas-container">
+    <canvas id="capChart" role="img" aria-label="Line chart showing AI capability, AI cost, unemployment, and GDP growth from 2024 to 2034, with a singularity event at 2029.">AI capability rises exponentially and exits the chart at 2029. AI cost collapses toward zero. Unemployment peaks near 40% then recovers. GDP dips at singularity then explodes.</canvas>
+  </div>
+  <div class="chart-note">
+    Capability index uses log scale — even so the line exits the chart at the AGI→ASI event (~2029). This is intentional and honest: no scale can represent what recursive self-improvement at ASI speed produces. The three lines that remain on the chart are human-scale economic metrics. The GDP dip at singularity = the danger zone. The 20% line = UBI forced threshold. AI cost approaching zero = post-scarcity begins.
+  </div>
+</div>
+
 <script>
+/* ── Job displacement data & render ── */
 const sectors = [
   {
     name: "Knowledge Work & Office",
@@ -337,6 +385,184 @@ function render() {
 }
 
 render();
+</script>
+
+<!-- ── Chart.js libs ── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+<script>
+/* ── Capability chart ── */
+const capLabels = ['2024','2025','2026','2027','2028','2029','2029.5','2030','2031','2032','2033','2034'];
+const capability = [2, 4, 8, 18, 45, 180, null, null, null, null, null, null];
+const aiCost     = [95, 82, 65, 45, 22, 8, 3, 1.5, 0.8, 0.6, 0.5, 0.5];
+const unemployment = [3.9, 4.2, 6.8, 9.4, 18, 31.5, 36, 38.2, 40.1, 38.5, 28, 18];
+const gdp          = [2.8, 2.9, 3.1, 3.4, 2.0, -1.5, 4.0, 12, 28, 45, 60, 72];
+
+Chart.register(window['chartjs-plugin-annotation']);
+
+new Chart(document.getElementById('capChart'), {
+  type: 'line',
+  data: {
+    labels: capLabels,
+    datasets: [
+      {
+        label: 'AI Capability',
+        data: capability,
+        borderColor: '#1D9E75',
+        backgroundColor: 'rgba(29,158,117,0.07)',
+        borderWidth: 3,
+        pointRadius: (ctx) => ctx.parsed?.y != null ? 4 : 0,
+        pointBackgroundColor: '#1D9E75',
+        fill: false,
+        tension: 0.3,
+        yAxisID: 'yLog',
+        spanGaps: false,
+      },
+      {
+        label: 'AI Cost to Use',
+        data: aiCost,
+        borderColor: '#378ADD',
+        backgroundColor: 'rgba(55,138,221,0.07)',
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointBackgroundColor: '#378ADD',
+        fill: false,
+        tension: 0.4,
+        borderDash: [6,3],
+        yAxisID: 'yLog'
+      },
+      {
+        label: 'Unemployment %',
+        data: unemployment,
+        borderColor: '#E24B4A',
+        backgroundColor: 'rgba(226,75,74,0.08)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: '#E24B4A',
+        fill: true,
+        tension: 0.4,
+        yAxisID: 'y2'
+      },
+      {
+        label: 'GDP Growth %',
+        data: gdp,
+        borderColor: '#F472B6',
+        backgroundColor: 'rgba(244,114,182,0.05)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: '#F472B6',
+        fill: false,
+        tension: 0.4,
+        borderDash: [3,2],
+        yAxisID: 'y2'
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1C1C26',
+        borderColor: '#2A2A38',
+        borderWidth: 1,
+        titleColor: '#F0F0F5',
+        bodyColor: '#8888AA',
+        callbacks: {
+          label: ctx => {
+            if (ctx.datasetIndex === 0) return ctx.parsed.y != null ? ` Capability: ${Math.round(ctx.parsed.y).toLocaleString()}` : ' Capability: OFF CHART (ASI)';
+            if (ctx.datasetIndex === 1) return ` AI cost: ${ctx.parsed.y?.toFixed(1) ?? '—'} (lower = cheaper)`;
+            if (ctx.datasetIndex === 2) return ` Unemployment: ${ctx.parsed.y}%`;
+            if (ctx.datasetIndex === 3) return ` GDP growth: ${ctx.parsed.y}% YoY`;
+          }
+        }
+      },
+      annotation: {
+        annotations: {
+          singularity: {
+            type: 'line',
+            xMin: '2029', xMax: '2029',
+            borderColor: '#EF9F27', borderWidth: 2, borderDash: [4,4],
+            label: {
+              display: true, content: 'AGI → ASI', position: 'start',
+              backgroundColor: '#EF9F27', color: '#412402',
+              font: { size: 11, weight: '600' }, padding: { x: 6, y: 4 }, borderRadius: 4, yAdjust: -1
+            }
+          },
+          arrowUp: {
+            type: 'line', xMin: '2029', xMax: '2029', yMin: 160, yMax: 200,
+            yScaleID: 'yLog', borderColor: '#1D9E75', borderWidth: 3,
+            label: { display: false }
+          },
+          ubiLine: {
+            type: 'line', yMin: 20, yMax: 20, yScaleID: 'y2',
+            borderColor: 'rgba(226,75,74,0.6)', borderWidth: 1.5, borderDash: [3,3],
+            label: {
+              display: true, content: '20% — UBI forced', position: 'end',
+              backgroundColor: 'rgba(226,75,74,0.85)', color: '#fff',
+              font: { size: 10, weight: '500' }, padding: { x: 5, y: 3 }, borderRadius: 4, xAdjust: -4
+            }
+          },
+          dangerZone: {
+            type: 'box', xMin: '2029', xMax: '2031',
+            backgroundColor: 'rgba(226,75,74,0.05)', borderColor: 'rgba(226,75,74,0.2)', borderWidth: 1,
+            label: {
+              display: true, content: ['⚠ danger zone', 'peak unemployment'],
+              font: { size: 9 }, color: '#E24B4A',
+              position: { x: 'center', y: 'center' }, yAdjust: -40
+            }
+          },
+          ubiBox: {
+            type: 'box', xMin: '2029.5', xMax: '2030',
+            backgroundColor: 'rgba(239,159,39,0.06)', borderColor: 'rgba(239,159,39,0.2)', borderWidth: 1,
+            label: {
+              display: true, content: 'UBI passes', font: { size: 9 }, color: '#BA7517',
+              position: { x: 'center', y: 'start' }, yAdjust: 40
+            }
+          },
+          gdpLabel: {
+            type: 'label', xValue: '2033', yValue: 72, yScaleID: 'y2',
+            content: ['GDP explodes', 'ASI productivity'], color: '#F472B6',
+            font: { size: 10 }, textAlign: 'center',
+            backgroundColor: 'rgba(244,114,182,0.1)', borderRadius: 4, padding: { x: 6, y: 4 }
+          },
+          costLabel: {
+            type: 'label', xValue: '2027', yValue: 82, yScaleID: 'yLog',
+            content: ['AI cost', 'collapsing →'], color: '#378ADD',
+            font: { size: 10 }, textAlign: 'center',
+            backgroundColor: 'rgba(55,138,221,0.08)', borderRadius: 4, padding: { x: 6, y: 4 }
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#555577', font: { size: 11 }, autoSkip: false, maxRotation: 45,
+          callback: (val, i) => capLabels[i] === '2029.5' ? '' : capLabels[i]
+        },
+        grid: { color: 'rgba(255,255,255,0.05)' }
+      },
+      yLog: {
+        type: 'logarithmic', position: 'left', min: 1, max: 200,
+        ticks: {
+          color: '#555577', font: { size: 10 },
+          callback: v => [1,5,10,50,100,200].includes(v) ? v : ''
+        },
+        grid: { color: 'rgba(255,255,255,0.05)' },
+        title: { display: true, text: 'capability / AI cost (log scale)', color: '#555577', font: { size: 10 } }
+      },
+      y2: {
+        position: 'right', min: -10, max: 80,
+        ticks: { color: '#555577', font: { size: 11 }, callback: v => v + '%' },
+        grid: { drawOnChartArea: false },
+        title: { display: true, text: 'unemployment % / GDP growth %', color: '#555577', font: { size: 10 } }
+      }
+    }
+  }
+});
 </script>
 </body>
 </html>
