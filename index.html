@@ -567,3 +567,70 @@ new Chart(document.getElementById('capChart'), {
 </script>
 </body>
 </html>
+
+<!-- Changelog -->
+<style>
+  .changelog { max-width: 960px; margin: 3rem auto 0; }
+  .changelog-hdr { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; }
+  .changelog-hdr::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .cl-version { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin-bottom: .6rem; overflow: hidden; }
+  .cl-version-hdr { padding: .6rem 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+  .cl-version-hdr:hover { background: var(--surface2); }
+  .cl-tag { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--red); font-weight: 700; }
+  .cl-date { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--text3); }
+  .cl-title { font-size: 12px; color: var(--text2); margin-left: .8rem; }
+  .cl-body { padding: 0 1rem .8rem; display: none; }
+  .cl-body.open { display: block; }
+  .cl-item { font-size: 11px; color: var(--text3); line-height: 1.8; padding-left: 1rem; position: relative; }
+  .cl-item::before { content: '—'; position: absolute; left: 0; color: var(--text3); }
+  .cl-item b { color: var(--text2); }
+</style>
+
+<div class="changelog">
+  <div class="changelog-hdr">Changelog</div>
+
+  <div class="cl-version">
+    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span class="cl-tag">v3</span>
+      <span class="cl-title">Split multiplier system + stat layout fix</span>
+      <span class="cl-date">Jun 2026</span>
+    </div>
+    <div class="cl-body">
+      <div class="cl-item"><b>Multiplier split by wave:</b> Wave 1 ÷5.0 (knowledge work — one AGI worker replaces 5+), Wave 2 ÷1.5 (robot wave, physically constrained)</div>
+      <div class="cl-item"><b>"To Run Economy" stat:</b> shows how few workers post-AGI are needed to produce today's full economic output vs 160M today</div>
+      <div class="cl-item"><b>Stats row fixed:</b> forced 8 equal columns — no more wrapping to a second line on desktop</div>
+      <div class="cl-item"><b>Stat sizing tightened:</b> padding and font size reduced to fit all 8 boxes in one row</div>
+      <div class="cl-item"><b>Stat labels clarified:</b> W1 AGI Workforce, W2 AGI Workforce, To Run Economy</div>
+    </div>
+  </div>
+
+  <div class="cl-version">
+    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span class="cl-tag">v2</span>
+      <span class="cl-title">New job categories + multiplier reframe</span>
+      <span class="cl-date">Jun 2026</span>
+    </div>
+    <div class="cl-body">
+      <div class="cl-item"><b>Multiplier reframed:</b> from ×1.55 "consumer spending collapse" to productivity amplification — non-replacement mechanism, headcount collapses through attrition not firing</div>
+      <div class="cl-item"><b>New immediate jobs:</b> Technical writers, Court reporters & stenographers, Business intelligence analysts, Procurement & purchasing clerks (+~1.75M)</div>
+      <div class="cl-item"><b>New fast jobs:</b> Project managers, Business analysts, Insurance adjusters, Supply chain analysts, PR specialists, Mental health therapists, Academic advisors (+~2.95M)</div>
+      <div class="cl-item"><b>New moderate jobs:</b> Dermatologists, Lab technicians, Actuaries, Property appraisers (+~0.52M)</div>
+      <div class="cl-item"><b>Stats row expanded:</b> 6 boxes → 8 boxes with W1/W2 amplified breakdowns</div>
+    </div>
+  </div>
+
+  <div class="cl-version">
+    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span class="cl-tag">v1</span>
+      <span class="cl-title">Initial release</span>
+      <span class="cl-date">Jun 2026</span>
+    </div>
+    <div class="cl-body">
+      <div class="cl-item">12 job sectors, 80+ roles across immediate / fast / moderate / robot wave timelines</div>
+      <div class="cl-item">Humanoid robot wave as separate displacement layer (Month 6–18)</div>
+      <div class="cl-item">Four-line macro chart: AI capability, AI cost, unemployment, GDP growth with singularity annotation</div>
+      <div class="cl-item">ASI framing: AGI and ASI are one event — public announcement comes after ASI already exists internally</div>
+      <div class="cl-item">×1.55 multiplier for indirect economic losses</div>
+    </div>
+  </div>
+</div>
