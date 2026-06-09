@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ASI Deployment — Job Displacement Model USA</title>
+<title>ASI Deployment — Job Displacement Model USA v6</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,6 +13,7 @@
     --blue: #0A84FF;
     --purple: #BF5AF2;
     --green: #1D9E75;
+    --yellow: #F0C040;
     --bg: #0A0A0F;
     --surface: #13131A;
     --surface2: #1C1C26;
@@ -37,7 +38,27 @@
   .stat-value { font-family: 'Space Mono', monospace; font-size: 1.05rem; font-weight: 700; color: var(--red); }
   .stat-value.green { color: var(--green); }
   .stat-value.orange { color: var(--orange); }
+  .stat-value.yellow { color: var(--yellow); }
   .stat-sub { font-size: 9px; color: var(--text3); margin-top: .2rem; line-height: 1.3; }
+
+  .threshold-box { max-width: 960px; margin: 0 auto 1.5rem; background: rgba(240,192,64,.05); border: 1px solid rgba(240,192,64,.3); border-radius: 8px; padding: 14px 16px; }
+  .threshold-box-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 10px; }
+  .threshold-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .threshold-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
+  .threshold-item-label { font-size: 9px; color: var(--text3); font-family: 'Space Mono', monospace; letter-spacing: .05em; margin-bottom: 4px; }
+  .threshold-item-value { font-size: 13px; font-weight: 600; color: var(--text); font-family: 'Space Mono', monospace; }
+  .threshold-item-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .threshold-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,59,48,.08); border: 1px solid rgba(255,59,48,.25); border-radius: 4px; font-size: 12px; color: #CC6060; line-height: 1.6; }
+  .threshold-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0; box-shadow: 0 0 6px var(--red); }
+
+  .task-horizon { max-width: 960px; margin: 0 auto 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .task-horizon-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+  .task-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .task-date { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text3); width: 90px; flex-shrink: 0; }
+  .task-bar-wrap { flex: 1; height: 20px; background: var(--surface2); border-radius: 3px; overflow: hidden; position: relative; }
+  .task-bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 6px; }
+  .task-bar-label { font-size: 10px; color: #fff; opacity: 0.9; white-space: nowrap; font-family: 'Space Mono', monospace; }
+  .task-note { font-size: 10px; color: var(--text3); width: 120px; flex-shrink: 0; text-align: right; line-height: 1.3; }
 
   .cascade-note { max-width: 960px; margin: 0 auto 1.5rem; background: rgba(255,149,0,.07); border: 1px solid rgba(255,149,0,.25); border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #AA8040; line-height: 1.7; }
   .cascade-note b { color: var(--orange); }
@@ -72,6 +93,7 @@
   .badge-fast { background: rgba(255,149,0,.12); color: var(--orange); border: 1px solid rgba(255,149,0,.25); }
   .badge-moderate { background: rgba(10,132,255,.12); color: var(--blue); border: 1px solid rgba(10,132,255,.25); }
   .badge-robot { background: rgba(191,90,242,.12); color: var(--purple); border: 1px solid rgba(191,90,242,.25); }
+  .badge-crossed { background: rgba(255,59,48,.2); color: #FF6B60; border: 1px solid rgba(255,59,48,.4); font-weight: 700; }
 
   .bar-wrap { width: 64px; flex-shrink: 0; }
   .bar-bg { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
@@ -115,16 +137,16 @@
   .cl-item::before { content: '—'; position: absolute; left: 0; color: var(--text3); }
   .cl-item b { color: var(--text2); }
 
-  @media (max-width:480px) { .bar-wrap { display:none; } .job-name { font-size: 11px; } }
+  @media (max-width:480px) { .bar-wrap { display:none; } .job-name { font-size: 11px; } .task-note { display: none; } }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-eyebrow">ASI Deployment Model — USA · v5</div>
+  <div class="header-eyebrow">ASI Deployment Model — USA · v6 · Post Anthropic RSI Paper</div>
   <h1>Job Displacement After ASI Public Release</h1>
-  <p class="header-sub">AGI and ASI are one event. By the time a public announcement is made, ASI already exists internally. This chart models displacement from ASI deployment day — not AGI. Timelines are compressed accordingly. Humanoid robot wave and autonomous vehicle displacement included as second layer. Mid/senior management layer now fully modeled.</p>
-  <span class="asi-note">&#9889; "AGI release" = ASI already exists. The gap is hours, not months.</span>
+  <p class="header-sub">AGI and ASI are one event. By the time a public announcement is made, ASI already exists internally. Updated with Anthropic's June 2026 recursive self-improvement data: 52x training optimization, 80% of code written by Claude, task horizons doubling every 4 months. You don't need AGI for displacement to accelerate — you just need the economic replacement threshold to cross. It already has.</p>
+  <span class="asi-note">&#9889; Economic replacement threshold already crossed for 60%+ of knowledge work — Jun 2026</span>
 </div>
 
 <div class="stats-row">
@@ -133,15 +155,92 @@
   <div class="stat"><div class="stat-label">Total Direct</div><div class="stat-value" id="s-total">&#8212;</div><div class="stat-sub">combined both waves</div></div>
   <div class="stat"><div class="stat-label">Cascade Lost</div><div class="stat-value orange" id="s-cascade">&#8212;</div><div class="stat-sub">indirect spending collapse</div></div>
   <div class="stat"><div class="stat-label">Total Effective</div><div class="stat-value" id="s-effective">&#8212;</div><div class="stat-sub">direct + cascade jobs</div></div>
+  <div class="stat"><div class="stat-label">Cost Ratio</div><div class="stat-value yellow">54-500x</div><div class="stat-sub">human vs AI monthly cost</div></div>
   <div class="stat"><div class="stat-label">W1 AGI Workers</div><div class="stat-value green" id="s-multi1">&#8212;</div><div class="stat-sub">needed for same output</div></div>
-  <div class="stat"><div class="stat-label">W2 AGI Workers</div><div class="stat-value green" id="s-multi2">&#8212;</div><div class="stat-sub">needed for same output</div></div>
   <div class="stat"><div class="stat-label">To Run Economy</div><div class="stat-value green" id="s-multi">&#8212;</div><div class="stat-sub">of 160M workers needed</div></div>
   <div class="stat"><div class="stat-label">% Workforce</div><div class="stat-value" id="s-pct">&#8212;</div><div class="stat-sub">160M baseline, direct</div></div>
   <div class="stat"><div class="stat-label">Day 1&#8211;30</div><div class="stat-value" id="s-imm">&#8212;</div><div class="stat-sub">immediate ASI layer</div></div>
 </div>
 
+<!-- ECONOMIC REPLACEMENT THRESHOLD -->
+<div class="threshold-box">
+  <div class="threshold-box-title">&#9888; The Economic Replacement Threshold — Already Crossed</div>
+  <div class="threshold-grid">
+    <div class="threshold-item">
+      <div class="threshold-item-label">Human fully loaded cost</div>
+      <div class="threshold-item-value">$65k–$120k/yr</div>
+      <div class="threshold-item-sub">$5,400–$10,000/month including benefits, overhead, HR, management, PTO, liability</div>
+    </div>
+    <div class="threshold-item">
+      <div class="threshold-item-label">AI equivalent cost (today)</div>
+      <div class="threshold-item-value">$20–$500/mo</div>
+      <div class="threshold-item-sub">API usage + Claude subscription. Dropping ~50% every 12 months. Approaching zero.</div>
+    </div>
+    <div class="threshold-item">
+      <div class="threshold-item-label">Quality threshold for replacement</div>
+      <div class="threshold-item-value">~70% of human</div>
+      <div class="threshold-item-sub">When AI does 70% of a job's tasks adequately, the remaining 30% gets absorbed or restructured. Headcount collapses.</div>
+    </div>
+    <div class="threshold-item">
+      <div class="threshold-item-label">Current AI quality (routine tasks)</div>
+      <div class="threshold-item-value">85–95%</div>
+      <div class="threshold-item-sub">Anthropic data: 76% success on open-ended tasks in May 2026, up 50 points in 6 months. Already superhuman on many subtasks.</div>
+    </div>
+    <div class="threshold-item">
+      <div class="threshold-item-label">Anthropic RSI paper — Jun 2026</div>
+      <div class="threshold-item-value">52x speedup</div>
+      <div class="threshold-item-sub">Claude Mythos Preview optimizing training code at 52x vs ~3x a year ago. Task horizons doubling every 4 months.</div>
+    </div>
+    <div class="threshold-item">
+      <div class="threshold-item-label">Task horizon trajectory</div>
+      <div class="threshold-item-value">Days → 2026</div>
+      <div class="threshold-item-sub">4-min tasks (2024) → 90-min (2025) → 12-hr (now) → days (2026) → weeks (2027). That covers most white collar work.</div>
+    </div>
+  </div>
+  <div class="threshold-status">
+    <div class="threshold-dot"></div>
+    <span>The replacement decision doesn't require AGI. It requires: AI cost &lt; human cost AND quality &#8805; 70%. Both conditions are already met for the majority of routine knowledge work. The displacement happening now with "imperfect" AI is proof. AGI removes the remaining exceptions simultaneously.</span>
+  </div>
+</div>
+
+<!-- ANTHROPIC TASK HORIZON CHART -->
+<div class="task-horizon">
+  <div class="task-horizon-title">Anthropic Data — Task Horizon Doubling Every 4 Months</div>
+  <div class="task-row">
+    <div class="task-date">Mar 2024</div>
+    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:2%;background:#378ADD;"><span class="task-bar-label">4 min</span></div></div>
+    <div class="task-note">Claude Opus 3</div>
+  </div>
+  <div class="task-row">
+    <div class="task-date">Mar 2025</div>
+    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:8%;background:#378ADD;"><span class="task-bar-label">90 min</span></div></div>
+    <div class="task-note">Claude Sonnet 3.7</div>
+  </div>
+  <div class="task-row">
+    <div class="task-date">Jun 2026</div>
+    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:28%;background:#EF9F27;"><span class="task-bar-label">12 hours</span></div></div>
+    <div class="task-note">Claude Opus 4.6</div>
+  </div>
+  <div class="task-row">
+    <div class="task-date">Late 2026</div>
+    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:55%;background:#E24B4A;"><span class="task-bar-label">Days (projected)</span></div></div>
+    <div class="task-note">Threshold for most jobs</div>
+  </div>
+  <div class="task-row">
+    <div class="task-date">2027</div>
+    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:85%;background:#E24B4A;"><span class="task-bar-label">Weeks (projected)</span></div></div>
+    <div class="task-note">Full white collar scope</div>
+  </div>
+  <div class="task-row">
+    <div class="task-date">2028 AGI</div>
+    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:100%;background:linear-gradient(90deg,#E24B4A,#9B8FE0);"><span class="task-bar-label">Unlimited — ASI within same week</span></div></div>
+    <div class="task-note">Modal arrival year</div>
+  </div>
+  <div style="margin-top:10px;font-size:10px;color:var(--text3);line-height:1.6;">Source: Anthropic Institute "When AI Builds Itself" Jun 2026. Task horizons doubling every 4 months, accelerating from prior 7-month rate. "Days" capability covers the full scope of most knowledge worker roles. This is before AGI.</div>
+</div>
+
 <div class="cascade-note">
-  <b>How to read these numbers:</b> &nbsp;Total Direct = jobs AGI/ASI eliminates outright across both waves. &nbsp;Cascade Lost = additional jobs lost through spending collapse — every displaced worker stops buying, eliminating ~0.55 downstream jobs in restaurants, retail, and local services. &nbsp;<b>Total Effective = the real number of Americans who lose income.</b> &nbsp;The productivity stats show how few AGI-augmented workers are needed to produce today's full economic output — this is why rehiring never happens.
+  <b>How to read these numbers:</b> &nbsp;Total Direct = jobs AGI/ASI eliminates outright across both waves. &nbsp;Cascade Lost = additional jobs lost through spending collapse — every displaced worker stops buying, eliminating ~0.55 downstream jobs in restaurants, retail, and local services. &nbsp;<b>Total Effective = the real number of Americans who lose income.</b> &nbsp;Cost Ratio shows how much cheaper AI is than a human employee monthly — this is why the replacement decision is arithmetic not ideology.
 </div>
 
 <div class="legend">
@@ -170,7 +269,7 @@
 
 <div class="chart-wrapper">
   <div class="chart-title">AGI &#8594; ASI: The Four Lines That Explain Everything</div>
-  <div class="chart-subtitle">AI capability exits measurable scale at the singularity point. The other three lines remain human-scale &#8212; that contrast is the point.</div>
+  <div class="chart-subtitle">AI capability exits measurable scale at the singularity point. Note the 2026 economic threshold line — displacement accelerates here, before AGI, because cost and quality already justify replacement for most knowledge work.</div>
   <div class="chart-legend">
     <div class="chart-leg"><div class="chart-leg-line" style="background:#1D9E75"></div>AI Capability (exits chart at ASI)</div>
     <div class="chart-leg"><div class="chart-leg-line" style="background:#378ADD"></div>AI Cost to Use</div>
@@ -181,7 +280,7 @@
     <canvas id="capChart"></canvas>
   </div>
   <div class="chart-note">
-    Capability index uses log scale &#8212; even so the line exits the chart at the AGI&#8594;ASI event (~2028&#8211;2029). This is intentional and honest: no scale can represent what recursive self-improvement at ASI speed produces. GDP dip at singularity = the danger zone. 20% unemployment line = UBI forced threshold. AI cost approaching zero = post-scarcity begins.
+    Capability index uses log scale — even so the line exits the chart at the AGI&#8594;ASI event (~2028). Economic threshold crossed annotation (2026) marks where AI cost + quality already justifies replacement for most routine knowledge work — no AGI required. 20% unemployment = UBI forced threshold. GDP dip at singularity = danger zone before abundance.
   </div>
 </div>
 
@@ -190,76 +289,58 @@
 
   <div class="cl-version">
     <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span class="cl-tag">v6</span>
+      <span class="cl-title">Economic replacement threshold added + Anthropic RSI paper integrated</span>
+      <span class="cl-date">Jun 2026</span>
+    </div>
+    <div class="cl-body open">
+      <div class="cl-item"><b>Economic Replacement Threshold section:</b> visualizes the breaking point where AI cost + quality justifies replacement without AGI. Human fully loaded $65-120k/year vs AI $20-500/month. 54x-500x cost ratio. Quality already 85-95% on routine tasks. Threshold already crossed for 60%+ of knowledge work.</div>
+      <div class="cl-item"><b>Anthropic task horizon chart added:</b> tracks AI task completion time doubling every 4 months per Anthropic Institute paper. 4 min (2024) to 12 hours (2026) to days (late 2026) to weeks (2027) to unlimited (2028 AGI). This covers the full scope of most white collar jobs before AGI arrives.</div>
+      <div class="cl-item"><b>52x stat integrated:</b> Claude Mythos Preview optimizing training code at 52x vs ~3x a year prior. Engineers shipping 8x more code. 80% of Anthropic's production code now written by Claude. Open-ended task success rate 76%, up 50 points in 6 months.</div>
+      <div class="cl-item"><b>Chart updated:</b> economic threshold annotation added at 2026. AGI modal year moved to 2028. Chart now shows the pre-AGI displacement acceleration clearly.</div>
+      <div class="cl-item"><b>Cost Ratio stat added:</b> shows 54x-500x monthly cost difference between human employee and AI equivalent.</div>
+      <div class="cl-item"><b>Key framing update:</b> displacement doesn't require AGI — it requires cost &lt; human AND quality &#8805; 70%. Both conditions already met for majority of routine knowledge work as of June 2026.</div>
+    </div>
+  </div>
+
+  <div class="cl-version">
+    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
       <span class="cl-tag">v5</span>
       <span class="cl-title">Mid/senior management modeled + cascade jobs visualized + accuracy fixes</span>
       <span class="cl-date">Jun 2026</span>
     </div>
-    <div class="cl-body open">
-      <div class="cl-item"><b>New sector &#8212; Mid &amp; Senior Management:</b> middle managers, operations managers, program/portfolio managers, directors (non-C-suite), VPs (non-executive), department heads. ~3.8M jobs at fast speed. The entire layer whose job is synthesizing reports and running meetings.</div>
-      <div class="cl-item"><b>Cascade Lost stat added:</b> shows indirect spending collapse jobs (direct &#215; 0.55) &#8212; every displaced worker stops buying, eliminating downstream restaurant, retail, and local service jobs. Total Effective = direct + cascade.</div>
-      <div class="cl-item"><b>Finance additions:</b> insurance underwriters (400k, immediate), loan processors (300k, immediate), stockbrokers &amp; securities sales reps (200k, fast)</div>
-      <div class="cl-item"><b>Healthcare additions:</b> medical scribes (100k, immediate), veterinary technicians (100k, fast), occupational therapy assistants (100k, moderate)</div>
-      <div class="cl-item"><b>Government additions:</b> 911 dispatchers (100k, fast), court clerks &amp; judicial support (150k, fast), customs &amp; border processing agents (50k, moderate)</div>
-      <div class="cl-item"><b>Education additions:</b> academic research assistants (500k, fast)</div>
-      <div class="cl-item"><b>Accuracy fixes:</b> school bus drivers corrected from 68% to 38% (regulatory/liability delay around children); dentists corrected from 46% to 22% (physical manipulation component survives longer)</div>
+    <div class="cl-body">
+      <div class="cl-item"><b>New sector — Mid &amp; Senior Management:</b> ~3.8M jobs. Middle managers, operations managers, directors, VPs, department heads.</div>
+      <div class="cl-item"><b>Cascade Lost stat added:</b> indirect spending collapse jobs (direct x 0.55)</div>
+      <div class="cl-item"><b>Finance:</b> insurance underwriters, loan processors, stockbrokers</div>
+      <div class="cl-item"><b>Healthcare:</b> medical scribes, veterinary technicians, OT assistants</div>
+      <div class="cl-item"><b>Government:</b> 911 dispatchers, court clerks, customs agents</div>
+      <div class="cl-item"><b>Education:</b> academic research assistants (500k)</div>
+      <div class="cl-item"><b>Accuracy fixes:</b> school bus drivers 68%→38%, dentists 46%→22%</div>
     </div>
   </div>
 
   <div class="cl-version">
     <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
       <span class="cl-tag">v4</span>
-      <span class="cl-title">Full economy coverage &#8212; 2 new sectors, 40+ new jobs</span>
+      <span class="cl-title">Full economy coverage — 2 new sectors, 40+ new jobs</span>
       <span class="cl-date">Jun 2026</span>
     </div>
     <div class="cl-body">
-      <div class="cl-item"><b>New sector &#8212; Transportation &amp; Autonomous Vehicles:</b> taxi/rideshare, parking attendants, toll booth operators, chauffeurs, city bus drivers, school bus drivers, subway operators, last-mile delivery drivers</div>
-      <div class="cl-item"><b>New sector &#8212; Engineering &amp; Technical:</b> CAD drafters, industrial engineers, mechanical engineers, electrical engineers, cost estimators, building inspectors, surveyors, environmental engineers</div>
-      <div class="cl-item"><b>Knowledge work additions:</b> telemarketers, bill collectors, operations research analysts, grant writers, management analysts (800k), budget analysts, statisticians</div>
-      <div class="cl-item"><b>Media/Creative additions:</b> UX/UI designers, stock photographers, commercial animators, voice actors, fashion designers (mass market), interior designers (commercial), audio engineers</div>
-      <div class="cl-item"><b>Finance additions:</b> title examiners &amp; escrow officers, mortgage brokers, credit analysts</div>
-      <div class="cl-item"><b>Healthcare additions:</b> medical assistants (admin), health info technicians, sonographers, optometrists (diagnostic)</div>
-      <div class="cl-item"><b>Robot wave additions:</b> forklift operators, CNC machine operators, auto mechanics (routine), car wash attendants, hotel housekeeping, phlebotomists, dental hygienists, food runners &amp; bus boys</div>
+      <div class="cl-item">Transportation &amp; AV sector. Engineering &amp; Technical sector. 40+ new roles across all sectors.</div>
     </div>
   </div>
 
   <div class="cl-version">
     <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span class="cl-tag">v3</span>
-      <span class="cl-title">Split multiplier system + stat layout fix</span>
+      <span class="cl-tag">v1–v3</span>
+      <span class="cl-title">Initial release through split multiplier system</span>
       <span class="cl-date">Jun 2026</span>
     </div>
     <div class="cl-body">
-      <div class="cl-item"><b>Multiplier split by wave:</b> Wave 1 &#247;5.0 (knowledge work), Wave 2 &#247;1.5 (physically constrained)</div>
-      <div class="cl-item"><b>"To Run Economy" stat:</b> shows workers needed post-AGI to produce today's full economic output</div>
-      <div class="cl-item"><b>Stats row fixed:</b> equal columns, no wrapping to second line</div>
-    </div>
-  </div>
-
-  <div class="cl-version">
-    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span class="cl-tag">v2</span>
-      <span class="cl-title">15 new job categories + multiplier reframe</span>
-      <span class="cl-date">Jun 2026</span>
-    </div>
-    <div class="cl-body">
-      <div class="cl-item"><b>Multiplier reframed:</b> from &#215;1.55 consumer spending collapse to non-replacement productivity amplification mechanism</div>
-      <div class="cl-item"><b>New immediate:</b> technical writers, court reporters, BI analysts, procurement clerks</div>
-      <div class="cl-item"><b>New fast:</b> project managers, business analysts, insurance adjusters, supply chain analysts, PR specialists, mental health therapists, academic advisors</div>
-      <div class="cl-item"><b>New moderate:</b> dermatologists, lab technicians, actuaries, property appraisers</div>
-    </div>
-  </div>
-
-  <div class="cl-version">
-    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span class="cl-tag">v1</span>
-      <span class="cl-title">Initial release</span>
-      <span class="cl-date">Jun 2026</span>
-    </div>
-    <div class="cl-body">
-      <div class="cl-item">12 job sectors, 80+ roles across immediate / fast / moderate / robot wave timelines</div>
-      <div class="cl-item">Humanoid robot wave as separate displacement layer (Month 6&#8211;18)</div>
-      <div class="cl-item">Four-line macro chart: AI capability, AI cost, unemployment, GDP with singularity annotation</div>
-      <div class="cl-item">ASI framing: AGI and ASI are one event &#8212; public announcement comes after ASI already exists internally</div>
+      <div class="cl-item">v1: Initial release, 12 sectors, 80+ roles, four-line macro chart</div>
+      <div class="cl-item">v2: 15 new job categories, multiplier reframe</div>
+      <div class="cl-item">v3: Split multiplier (Wave 1 ÷5.0, Wave 2 ÷1.5), "To Run Economy" stat</div>
     </div>
   </div>
 </div>
@@ -489,7 +570,7 @@ const sectors = [
     ]
   },
   {
-    name: "Robot & AV Wave — Month 6–18",
+    name: "Robot & AV Wave — Month 6-18",
     jobs: [
       {n:"Janitors & commercial cleaners",lost:2.8,pct:72,speed:"robot"},
       {n:"Home health aides & personal care",lost:3.1,pct:61,speed:"robot"},
@@ -572,17 +653,16 @@ function render() {
   document.getElementById('s-cascade').textContent = cascadeLost.toFixed(1) + 'M';
   document.getElementById('s-effective').textContent = totalEffective.toFixed(1) + 'M';
   document.getElementById('s-multi1').textContent = multi1.toFixed(1) + 'M';
-  document.getElementById('s-multi2').textContent = multi2.toFixed(1) + 'M';
   document.getElementById('s-multi').textContent = multiTotal.toFixed(1) + 'M';
   document.getElementById('s-pct').textContent = pct.toFixed(0) + '%';
   document.getElementById('s-imm').textContent = imm.toFixed(1) + 'M';
 
   document.getElementById('note').innerHTML =
-    '<b>What this models:</b> Displacement from ASI deployment day. ASI deployed at full capability from day one, no ramp up. Immediate window is 30 days -- contract non-renewals happen fast when the capability gap is unambiguous.<br><br>' +
-    '<b>The non-replacement mechanism:</b> Companies do not need to fire anyone. One person with AGI does the work of 5+, so the company simply never posts the job listing when someone leaves. Headcount collapses through attrition and compression, not headlines.<br><br>' +
-    '<b>Cascade jobs explained:</b> Every direct job lost eliminates approximately 0.55 additional downstream jobs within 18 months as spending evaporates from knowledge-worker cities. Local restaurants, retail, and services collapse in sequence. The cascade number shown represents those indirect losses -- the real human cost is Total Effective, not just Total Direct.<br><br>' +
-    '<b>Multipliers are split by wave:</b> Wave 1 divided by 5.0 (knowledge work productivity amplification). Wave 2 divided by 1.5 (robot/AV wave, physically constrained). "To Run Economy" shows how few workers are needed post-AGI to produce today\'s full economic output vs 160M today.<br><br>' +
-    '<b>What this does not model:</b> Jobs that survive and increase in value -- live officiating, coaching, physical presence roles, creative arts, genuine human connection work. These compress in supply and rise in price as the automated world creates demand for authentically human experiences. 160M workforce baseline.';
+    '<b>What this models:</b> Displacement from ASI deployment day. The economic replacement threshold (AI cost + quality justifying replacement) is already crossed for most routine knowledge work before AGI even arrives. AGI removes the remaining exceptions simultaneously on day one.<br><br>' +
+    '<b>The non-replacement mechanism:</b> Companies do not need to fire anyone. One person with AGI does the work of 5+, so the company never posts the job listing when someone leaves. Headcount collapses through attrition and compression, not headlines.<br><br>' +
+    '<b>The compounding sideways mechanism:</b> Once AI automates 50% of a job, the remaining 40% becomes either cheaper to automate or consolidates into fewer higher-skilled roles. Structural collapse of entire job categories within 18-24 months — not gradual attrition. (Art Voloshyn, AI engineer, LinkedIn Jun 2026)<br><br>' +
+    '<b>Cascade jobs:</b> Every direct job lost eliminates ~0.55 additional downstream jobs within 18 months. Total Effective = Direct + Cascade = the real human cost.<br><br>' +
+    '<b>What this does not model:</b> Jobs that survive and increase in value — live officiating, coaching, physical presence roles, creative arts, genuine human connection. These compress in supply and rise in price as the automated world creates demand for authentically human experiences. 160M workforce baseline.';
 }
 
 render();
@@ -594,7 +674,7 @@ render();
 const capLabels = ['2024','2025','2026','2027','2028','2029','2029.5','2030','2031','2032','2033','2034'];
 const capability   = [2, 4, 8, 18, 45, 180, null, null, null, null, null, null];
 const aiCost       = [95, 82, 65, 45, 22, 8, 3, 1.5, 0.8, 0.6, 0.5, 0.5];
-const unemployment = [3.9, 4.2, 6.8, 9.4, 18, 31.5, 36, 38.2, 40.1, 38.5, 28, 18];
+const unemployment = [3.9, 4.2, 6.8, 11.5, 20, 31.5, 36, 38.2, 40.1, 38.5, 28, 18];
 const gdp          = [2.8, 2.9, 3.1, 3.4, 2.0, -1.5, 4.0, 12, 28, 45, 60, 72];
 
 Chart.register(window['chartjs-plugin-annotation']);
@@ -678,13 +758,22 @@ new Chart(document.getElementById('capChart'), {
       },
       annotation: {
         annotations: {
+          thresholdCrossed: {
+            type: 'line', xMin: '2026', xMax: '2026',
+            borderColor: '#F0C040', borderWidth: 1.5, borderDash: [4,4],
+            label: {
+              display: true, content: 'Economic threshold crossed', position: 'start',
+              backgroundColor: 'rgba(240,192,64,0.9)', color: '#2A1800',
+              font: { size: 10, weight: '600' }, padding: { x: 6, y: 4 }, borderRadius: 4, yAdjust: 40
+            }
+          },
           singularity: {
-            type: 'line', xMin: '2029', xMax: '2029',
+            type: 'line', xMin: '2028', xMax: '2028',
             borderColor: '#EF9F27', borderWidth: 2, borderDash: [4,4],
             label: {
-              display: true, content: 'AGI -> ASI', position: 'start',
+              display: true, content: 'AGI -> ASI (modal 2028)', position: 'start',
               backgroundColor: '#EF9F27', color: '#412402',
-              font: { size: 11, weight: '600' }, padding: { x: 6, y: 4 }, borderRadius: 4, yAdjust: -1
+              font: { size: 10, weight: '600' }, padding: { x: 6, y: 4 }, borderRadius: 4, yAdjust: -1
             }
           },
           ubiLine: {
@@ -697,7 +786,7 @@ new Chart(document.getElementById('capChart'), {
             }
           },
           dangerZone: {
-            type: 'box', xMin: '2029', xMax: '2031',
+            type: 'box', xMin: '2028', xMax: '2031',
             backgroundColor: 'rgba(226,75,74,0.05)', borderColor: 'rgba(226,75,74,0.2)', borderWidth: 1,
             label: {
               display: true, content: ['danger zone', 'peak unemployment'],
@@ -706,7 +795,7 @@ new Chart(document.getElementById('capChart'), {
             }
           },
           ubiBox: {
-            type: 'box', xMin: '2029.5', xMax: '2030',
+            type: 'box', xMin: '2029', xMax: '2029.5',
             backgroundColor: 'rgba(239,159,39,0.06)', borderColor: 'rgba(239,159,39,0.2)', borderWidth: 1,
             label: {
               display: true, content: 'UBI passes', font: { size: 9 }, color: '#BA7517',
@@ -744,4 +833,8 @@ new Chart(document.getElementById('capChart'), {
 });
 </script>
 </body>
-</html>
+</html>"""
+
+with open('/mnt/user-data/outputs/index.html', 'w') as f:
+    f.write(content)
+print("v6 written:", len(content), "chars")
