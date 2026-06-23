@@ -3,17 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ASI Deployment — Job Displacement Model USA v6</title>
+<title>AI Displacement — What We Know vs. What's Projected</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --red: #FF3B30;
-    --orange: #FF9500;
-    --blue: #0A84FF;
-    --purple: #BF5AF2;
-    --green: #1D9E75;
-    --yellow: #F0C040;
+    --red: #E24B4A;
+    --orange: #BA7517;
+    --blue: #185FA5;
+    --purple: #7D5FBF;
+    --green: #3B6D11;
     --bg: #0A0A0F;
     --surface: #13131A;
     --surface2: #1C1C26;
@@ -22,819 +21,343 @@
     --text2: #8888AA;
     --text3: #4A4A66;
   }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 2rem 1.5rem 4rem; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; padding: 2rem 1.25rem 4rem; }
+  .wrap { max-width: 880px; margin: 0 auto; }
 
-  .header { max-width: 960px; margin: 0 auto 2rem; }
-  .header-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--red); margin-bottom: .5rem; }
-  h1 { font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 600; line-height: 1.2; margin-bottom: .4rem; }
-  .header-sub { font-size: 12px; color: var(--text2); font-weight: 300; line-height: 1.6; }
-  .asi-note { display: inline-block; margin-top: .6rem; background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.3); border-radius: 4px; padding: 6px 12px; font-size: 11px; color: var(--red); font-family: 'Space Mono', monospace; }
+  .header { margin-bottom: 2rem; }
+  .eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--red); margin-bottom: .5rem; }
+  h1 { font-size: clamp(1.15rem, 3vw, 1.6rem); font-weight: 600; line-height: 1.25; margin-bottom: .6rem; }
+  .header-sub { font-size: 12.5px; color: var(--text2); line-height: 1.7; max-width: 680px; }
 
-  .stats-row { max-width: 960px; margin: 0 auto 1.5rem; display: grid; grid-template-columns: repeat(10, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  @media (max-width: 860px) { .stats-row { grid-template-columns: repeat(5, 1fr); } }
-  @media (max-width: 480px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
-  .stat { background: var(--surface); padding: .6rem .7rem; }
-  .stat-label { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .06em; text-transform: uppercase; color: var(--text3); margin-bottom: .3rem; }
-  .stat-value { font-family: 'Space Mono', monospace; font-size: 1.05rem; font-weight: 700; color: var(--red); }
-  .stat-value.green { color: var(--green); }
-  .stat-value.orange { color: var(--orange); }
-  .stat-value.yellow { color: var(--yellow); }
-  .stat-sub { font-size: 9px; color: var(--text3); margin-top: .2rem; line-height: 1.3; }
+  .legend-key { display: flex; gap: 1.5rem; margin: 1.25rem 0 2rem; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-text { color: var(--text2); }
+  .legend-text b { color: var(--text); }
 
-  .threshold-box { max-width: 960px; margin: 0 auto 1.5rem; background: rgba(240,192,64,.05); border: 1px solid rgba(240,192,64,.3); border-radius: 8px; padding: 14px 16px; }
-  .threshold-box-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 10px; }
-  .threshold-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 12px; }
-  .threshold-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; }
-  .threshold-item-label { font-size: 9px; color: var(--text3); font-family: 'Space Mono', monospace; letter-spacing: .05em; margin-bottom: 4px; }
-  .threshold-item-value { font-size: 13px; font-weight: 600; color: var(--text); font-family: 'Space Mono', monospace; }
-  .threshold-item-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
-  .threshold-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,59,48,.08); border: 1px solid rgba(255,59,48,.25); border-radius: 4px; font-size: 12px; color: #CC6060; line-height: 1.6; }
-  .threshold-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0; box-shadow: 0 0 6px var(--red); }
+  /* SECTION 1: confirmed data */
+  .section-1 { background: rgba(59,109,17,.06); border: 1px solid rgba(59,109,17,.25); border-radius: 10px; padding: 1.25rem 1.4rem; margin-bottom: 1.5rem; }
+  .section-tag { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--green); margin-bottom: .9rem; display: flex; align-items: center; gap: 8px; }
+  .section-tag .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px var(--green); }
 
-  .task-horizon { max-width: 960px; margin: 0 auto 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
-  .task-horizon-title { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
-  .task-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .task-date { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text3); width: 90px; flex-shrink: 0; }
-  .task-bar-wrap { flex: 1; height: 20px; background: var(--surface2); border-radius: 3px; overflow: hidden; position: relative; }
-  .task-bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 6px; }
-  .task-bar-label { font-size: 10px; color: #fff; opacity: 0.9; white-space: nowrap; font-family: 'Space Mono', monospace; }
-  .task-note { font-size: 10px; color: var(--text3); width: 120px; flex-shrink: 0; text-align: right; line-height: 1.3; }
+  .fact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .fact { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 11px 13px; }
+  .fact-num { font-family: 'Space Mono', monospace; font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .fact-label { font-size: 10.5px; color: var(--text2); line-height: 1.4; }
+  .fact-source { font-size: 9px; color: var(--text3); margin-top: 5px; font-style: italic; }
 
-  .cascade-note { max-width: 960px; margin: 0 auto 1.5rem; background: rgba(255,149,0,.07); border: 1px solid rgba(255,149,0,.25); border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #AA8040; line-height: 1.7; }
-  .cascade-note b { color: var(--orange); }
+  /* SECTION 2: capability radar (real, sourced) */
+  .section-2 { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.4rem; margin-bottom: 1.5rem; }
+  .cap-bars { display: flex; flex-direction: column; gap: 9px; margin-top: .9rem; }
+  .cap-row { display: grid; grid-template-columns: 150px 1fr 40px; gap: 10px; align-items: center; }
+  .cap-name { font-size: 11.5px; color: var(--text2); }
+  .cap-track { height: 14px; background: var(--surface2); border-radius: 4px; overflow: hidden; position: relative; }
+  .cap-fill-theory { height: 100%; background: rgba(24,95,165,.55); border-radius: 4px; position: absolute; }
+  .cap-fill-observed { height: 100%; background: var(--green); border-radius: 4px; position: absolute; }
+  .cap-pct { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text3); text-align: right; }
+  .cap-note { font-size: 10.5px; color: var(--text3); margin-top: 1rem; line-height: 1.6; border-top: 1px solid var(--surface2); padding-top: .8rem; }
 
-  .tabs { max-width: 960px; margin: 0 auto 1rem; display: flex; gap: 4px; flex-wrap: wrap; }
-  .tab { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; padding: 5px 12px; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all .15s; }
-  .tab:hover { color: var(--text2); border-color: var(--text3); }
-  .tab.t-all.active { background: var(--red); border-color: var(--red); color: #fff; }
-  .tab.t-immediate.active { background: rgba(255,59,48,.15); border-color: var(--red); color: var(--red); }
-  .tab.t-fast.active { background: rgba(255,149,0,.15); border-color: var(--orange); color: var(--orange); }
-  .tab.t-moderate.active { background: rgba(10,132,255,.15); border-color: var(--blue); color: var(--blue); }
-  .tab.t-robot.active { background: rgba(191,90,242,.15); border-color: var(--purple); color: var(--purple); }
+  /* SECTION 3: projected scenarios — clearly labeled as speculative */
+  .section-3-header { background: rgba(226,75,74,.08); border: 1px solid rgba(226,75,74,.3); border-radius: 10px; padding: 1rem 1.3rem; margin-bottom: 1.25rem; }
+  .warn-tag { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--red); display: flex; align-items: center; gap: 8px; margin-bottom: .6rem; }
+  .warn-tag .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 5px var(--red); }
+  .warn-text { font-size: 12px; color: #CC9090; line-height: 1.7; }
 
-  .legend { max-width: 960px; margin: 0 auto 1.5rem; display: flex; flex-wrap: wrap; gap: 1.2rem; }
-  .leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
-  .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .toggle-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+  .toggle-btn { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .05em; text-transform: uppercase; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text3); cursor: pointer; transition: all .15s; }
+  .toggle-btn:hover { color: var(--text2); }
+  .toggle-btn.active-wc { background: rgba(24,95,165,.18); border-color: var(--blue); color: var(--blue); }
+  .toggle-btn.active-bc { background: rgba(125,95,191,.18); border-color: var(--purple); color: var(--purple); }
 
-  .content { max-width: 960px; margin: 0 auto; }
-  .sector { background: var(--surface); border-radius: 6px; border: 1px solid var(--border); margin-bottom: .9rem; overflow: hidden; }
-  .sector-hdr { background: var(--surface2); padding: .55rem 1rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-  .sector-name { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); }
-  .sector-tot { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--red); }
+  .year-card { background: var(--surface); border: 1px solid var(--border); border-radius: 9px; margin-bottom: .7rem; padding: .95rem 1.2rem; }
+  .year-card-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: .6rem; flex-wrap: wrap; }
+  .year-num { font-family: 'Space Mono', monospace; font-size: 1.05rem; font-weight: 700; color: var(--text); }
+  .year-range { font-family: 'Space Mono', monospace; font-size: .95rem; font-weight: 700; }
+  .year-range.wc { color: var(--blue); }
+  .year-range.bc { color: var(--purple); }
+  .year-modal-tag { font-family: 'Space Mono', monospace; font-size: 8.5px; letter-spacing: .06em; text-transform: uppercase; background: rgba(226,75,74,.15); color: var(--red); border: 1px solid rgba(226,75,74,.3); padding: 2px 7px; border-radius: 4px; }
+  .year-bar-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: .55rem; }
+  .year-bar-fill { height: 100%; border-radius: 4px; }
+  .year-bar-fill.wc { background: var(--blue); }
+  .year-bar-fill.bc { background: var(--purple); }
+  .year-desc { font-size: 11.5px; color: var(--text2); line-height: 1.6; }
+  .agi-flag { display: inline-block; font-size: 9.5px; color: var(--orange); margin-top: 5px; font-family: 'Space Mono', monospace; }
 
-  .job-row { display: flex; align-items: center; gap: 8px; padding: 6px 1rem; border-bottom: 1px solid var(--border); transition: background .1s; animation: fadeIn .25s ease both; }
-  .job-row:last-child { border-bottom: none; }
-  .job-row:hover { background: var(--surface2); }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:translateY(0); } }
+  .scenario-content { display: none; }
+  .scenario-content.shown { display: block; }
 
-  .job-name { flex: 1; font-size: 12px; color: var(--text); min-width: 0; line-height: 1.3; }
-  .badge { font-family: 'Space Mono', monospace; font-size: 8.5px; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; letter-spacing: .03em; white-space: nowrap; }
-  .badge-immediate { background: rgba(255,59,48,.12); color: var(--red); border: 1px solid rgba(255,59,48,.25); }
-  .badge-fast { background: rgba(255,149,0,.12); color: var(--orange); border: 1px solid rgba(255,149,0,.25); }
-  .badge-moderate { background: rgba(10,132,255,.12); color: var(--blue); border: 1px solid rgba(10,132,255,.25); }
-  .badge-robot { background: rgba(191,90,242,.12); color: var(--purple); border: 1px solid rgba(191,90,242,.25); }
-  .badge-crossed { background: rgba(255,59,48,.2); color: #FF6B60; border: 1px solid rgba(255,59,48,.4); font-weight: 700; }
+  /* SECTION 4: unemployment / UBI projection */
+  .section-4 { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.4rem; margin: 1.5rem 0; }
+  .ubi-year { display: grid; grid-template-columns: 70px 1fr 130px; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--surface2); }
+  .ubi-year:last-child { border-bottom: none; }
+  .ubi-yr-label { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); font-weight: 600; }
+  .ubi-bar-track { height: 16px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .ubi-bar-fill { height: 100%; border-radius: 4px; background: var(--red); display: flex; align-items: center; }
+  .ubi-pct-label { font-size: 9.5px; color: #fff; padding-left: 6px; font-family: 'Space Mono', monospace; }
+  .ubi-desc { font-size: 10px; color: var(--text3); text-align: right; line-height: 1.4; }
 
-  .bar-wrap { width: 64px; flex-shrink: 0; }
-  .bar-bg { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 2px; transition: width .4s ease; }
-  .bar-immediate { background: var(--red); }
-  .bar-fast { background: var(--orange); }
-  .bar-moderate { background: var(--blue); }
-  .bar-robot { background: var(--purple); }
-
-  .job-pct { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text2); min-width: 30px; text-align: right; flex-shrink: 0; }
-  .job-lost { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--red); min-width: 44px; text-align: right; flex-shrink: 0; }
-
-  .note { max-width: 960px; margin: 1.5rem auto 0; font-size: 11px; color: var(--text3); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 1rem; }
-  .note b { color: var(--text2); }
-
-  .section-divider { max-width: 960px; margin: 3rem auto 2rem; display: flex; align-items: center; gap: 1rem; }
-  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
-  .section-divider-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--text3); white-space: nowrap; }
-
-  .chart-wrapper { max-width: 960px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.5rem 1rem; }
-  .chart-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: .3rem; }
-  .chart-subtitle { font-size: 11px; color: #6666AA; margin-bottom: 1.2rem; line-height: 1.5; }
-  .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 1rem; font-size: 11px; color: #8888AA; }
-  .chart-leg { display: flex; align-items: center; gap: 5px; }
-  .chart-leg-line { width: 18px; height: 3px; border-radius: 2px; }
-  .canvas-container { position: relative; width: 100%; height: 400px; }
-  .chart-note { font-size: 10px; color: var(--text3); margin-top: .9rem; font-style: italic; line-height: 1.6; border-top: 1px solid var(--surface2); padding-top: .8rem; }
-
-  .changelog { max-width: 960px; margin: 3rem auto 0; }
-  .changelog-hdr { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem; }
-  .changelog-hdr::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .cl-version { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin-bottom: .6rem; overflow: hidden; }
-  .cl-version-hdr { padding: .6rem 1rem; display: flex; align-items: center; gap: .8rem; cursor: pointer; user-select: none; }
-  .cl-version-hdr:hover { background: var(--surface2); }
-  .cl-tag { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--red); font-weight: 700; }
-  .cl-date { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--text3); margin-left: auto; }
-  .cl-title { font-size: 12px; color: var(--text2); }
-  .cl-body { padding: 0 1rem .8rem; display: none; }
-  .cl-body.open { display: block; }
-  .cl-item { font-size: 11px; color: var(--text3); line-height: 1.9; padding-left: 1rem; position: relative; }
-  .cl-item::before { content: '—'; position: absolute; left: 0; color: var(--text3); }
-  .cl-item b { color: var(--text2); }
-
-  @media (max-width:480px) { .bar-wrap { display:none; } .job-name { font-size: 11px; } .task-note { display: none; } }
+  .footer-note { font-size: 11px; color: var(--text3); line-height: 1.8; border-top: 1px solid var(--border); padding-top: 1.1rem; margin-top: 2rem; }
+  .footer-note b { color: var(--text2); }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="header">
-  <div class="header-eyebrow">ASI Deployment Model — USA · v6 · Post Anthropic RSI Paper</div>
-  <h1>Job Displacement After ASI Public Release</h1>
-  <p class="header-sub">AGI and ASI are one event. By the time a public announcement is made, ASI already exists internally. Updated with Anthropic's June 2026 recursive self-improvement data: 52x training optimization, 80% of code written by Claude, task horizons doubling every 4 months. You don't need AGI for displacement to accelerate — you just need the economic replacement threshold to cross. It already has.</p>
-  <span class="asi-note">&#9889; Economic replacement threshold already crossed for 60%+ of knowledge work — Jun 2026</span>
-</div>
-
-<div class="stats-row">
-  <div class="stat"><div class="stat-label">Wave 1 Direct</div><div class="stat-value" id="s-w1">&#8212;</div><div class="stat-sub">cognitive displacement</div></div>
-  <div class="stat"><div class="stat-label">Wave 2 Direct</div><div class="stat-value" id="s-w2">&#8212;</div><div class="stat-sub">robot + AV wave</div></div>
-  <div class="stat"><div class="stat-label">Total Direct</div><div class="stat-value" id="s-total">&#8212;</div><div class="stat-sub">combined both waves</div></div>
-  <div class="stat"><div class="stat-label">Cascade Lost</div><div class="stat-value orange" id="s-cascade">&#8212;</div><div class="stat-sub">indirect spending collapse</div></div>
-  <div class="stat"><div class="stat-label">Total Effective</div><div class="stat-value" id="s-effective">&#8212;</div><div class="stat-sub">direct + cascade jobs</div></div>
-  <div class="stat"><div class="stat-label">Cost Ratio</div><div class="stat-value yellow">54-500x</div><div class="stat-sub">human vs AI monthly cost</div></div>
-  <div class="stat"><div class="stat-label">W1 AGI Workers</div><div class="stat-value green" id="s-multi1">&#8212;</div><div class="stat-sub">needed for same output</div></div>
-  <div class="stat"><div class="stat-label">To Run Economy</div><div class="stat-value green" id="s-multi">&#8212;</div><div class="stat-sub">of 160M workers needed</div></div>
-  <div class="stat"><div class="stat-label">% Workforce</div><div class="stat-value" id="s-pct">&#8212;</div><div class="stat-sub">160M baseline, direct</div></div>
-  <div class="stat"><div class="stat-label">Day 1&#8211;30</div><div class="stat-value" id="s-imm">&#8212;</div><div class="stat-sub">immediate ASI layer</div></div>
-</div>
-
-<!-- ECONOMIC REPLACEMENT THRESHOLD -->
-<div class="threshold-box">
-  <div class="threshold-box-title">&#9888; The Economic Replacement Threshold — Already Crossed</div>
-  <div class="threshold-grid">
-    <div class="threshold-item">
-      <div class="threshold-item-label">Human fully loaded cost</div>
-      <div class="threshold-item-value">$65k–$120k/yr</div>
-      <div class="threshold-item-sub">$5,400–$10,000/month including benefits, overhead, HR, management, PTO, liability</div>
-    </div>
-    <div class="threshold-item">
-      <div class="threshold-item-label">AI equivalent cost (today)</div>
-      <div class="threshold-item-value">$20–$500/mo</div>
-      <div class="threshold-item-sub">API usage + Claude subscription. Dropping ~50% every 12 months. Approaching zero.</div>
-    </div>
-    <div class="threshold-item">
-      <div class="threshold-item-label">Quality threshold for replacement</div>
-      <div class="threshold-item-value">~70% of human</div>
-      <div class="threshold-item-sub">When AI does 70% of a job's tasks adequately, the remaining 30% gets absorbed or restructured. Headcount collapses.</div>
-    </div>
-    <div class="threshold-item">
-      <div class="threshold-item-label">Current AI quality (routine tasks)</div>
-      <div class="threshold-item-value">85–95%</div>
-      <div class="threshold-item-sub">Anthropic data: 76% success on open-ended tasks in May 2026, up 50 points in 6 months. Already superhuman on many subtasks.</div>
-    </div>
-    <div class="threshold-item">
-      <div class="threshold-item-label">Anthropic RSI paper — Jun 2026</div>
-      <div class="threshold-item-value">52x speedup</div>
-      <div class="threshold-item-sub">Claude Mythos Preview optimizing training code at 52x vs ~3x a year ago. Task horizons doubling every 4 months.</div>
-    </div>
-    <div class="threshold-item">
-      <div class="threshold-item-label">Task horizon trajectory</div>
-      <div class="threshold-item-value">Days → 2026</div>
-      <div class="threshold-item-sub">4-min tasks (2024) → 90-min (2025) → 12-hr (now) → days (2026) → weeks (2027). That covers most white collar work.</div>
-    </div>
+  <div class="header">
+    <div class="eyebrow">AI Displacement Tracker — June 2026</div>
+    <h1>What We Actually Know vs. What's a Reasoned Guess</h1>
+    <p class="header-sub">This page keeps two things separate on purpose: confirmed data (sourced, real, already happened) and projected scenarios (reasoned estimates with real uncertainty, not calculations). Scale is shown honestly — the capability gap is real and large. The specific years and percentages below it are a defensible scenario, not a forecast to bet on.</p>
   </div>
-  <div class="threshold-status">
-    <div class="threshold-dot"></div>
-    <span>The replacement decision doesn't require AGI. It requires: AI cost &lt; human cost AND quality &#8805; 70%. Both conditions are already met for the majority of routine knowledge work. The displacement happening now with "imperfect" AI is proof. AGI removes the remaining exceptions simultaneously.</span>
-  </div>
-</div>
 
-<!-- ANTHROPIC TASK HORIZON CHART -->
-<div class="task-horizon">
-  <div class="task-horizon-title">Anthropic Data — Task Horizon Doubling Every 4 Months</div>
-  <div class="task-row">
-    <div class="task-date">Mar 2024</div>
-    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:2%;background:#378ADD;"><span class="task-bar-label">4 min</span></div></div>
-    <div class="task-note">Claude Opus 3</div>
+  <div class="legend-key">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div><span class="legend-text"><b>Confirmed</b> — sourced, already happened</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(24,95,165,.6)"></div><span class="legend-text"><b>Theoretical capability</b> — what AI could do</span></div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><span class="legend-text"><b>Projected scenario</b> — reasoned, not certain</span></div>
   </div>
-  <div class="task-row">
-    <div class="task-date">Mar 2025</div>
-    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:8%;background:#378ADD;"><span class="task-bar-label">90 min</span></div></div>
-    <div class="task-note">Claude Sonnet 3.7</div>
-  </div>
-  <div class="task-row">
-    <div class="task-date">Jun 2026</div>
-    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:28%;background:#EF9F27;"><span class="task-bar-label">12 hours</span></div></div>
-    <div class="task-note">Claude Opus 4.6</div>
-  </div>
-  <div class="task-row">
-    <div class="task-date">Late 2026</div>
-    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:55%;background:#E24B4A;"><span class="task-bar-label">Days (projected)</span></div></div>
-    <div class="task-note">Threshold for most jobs</div>
-  </div>
-  <div class="task-row">
-    <div class="task-date">2027</div>
-    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:85%;background:#E24B4A;"><span class="task-bar-label">Weeks (projected)</span></div></div>
-    <div class="task-note">Full white collar scope</div>
-  </div>
-  <div class="task-row">
-    <div class="task-date">2028 AGI</div>
-    <div class="task-bar-wrap"><div class="task-bar-fill" style="width:100%;background:linear-gradient(90deg,#E24B4A,#9B8FE0);"><span class="task-bar-label">Unlimited — ASI within same week</span></div></div>
-    <div class="task-note">Modal arrival year</div>
-  </div>
-  <div style="margin-top:10px;font-size:10px;color:var(--text3);line-height:1.6;">Source: Anthropic Institute "When AI Builds Itself" Jun 2026. Task horizons doubling every 4 months, accelerating from prior 7-month rate. "Days" capability covers the full scope of most knowledge worker roles. This is before AGI.</div>
-</div>
 
-<div class="cascade-note">
-  <b>How to read these numbers:</b> &nbsp;Total Direct = jobs AGI/ASI eliminates outright across both waves. &nbsp;Cascade Lost = additional jobs lost through spending collapse — every displaced worker stops buying, eliminating ~0.55 downstream jobs in restaurants, retail, and local services. &nbsp;<b>Total Effective = the real number of Americans who lose income.</b> &nbsp;Cost Ratio shows how much cheaper AI is than a human employee monthly — this is why the replacement decision is arithmetic not ideology.
-</div>
-
-<div class="legend">
-  <div class="leg"><div class="leg-dot" style="background:#FF3B30"></div>Immediate &#8212; Day 1&#8211;30</div>
-  <div class="leg"><div class="leg-dot" style="background:#FF9500"></div>Fast &#8212; Month 1&#8211;4</div>
-  <div class="leg"><div class="leg-dot" style="background:#0A84FF"></div>Moderate &#8212; Month 4&#8211;9</div>
-  <div class="leg"><div class="leg-dot" style="background:#BF5AF2"></div>Robot/AV Wave &#8212; Month 6&#8211;18</div>
-</div>
-
-<div class="tabs">
-  <button class="tab t-all active" onclick="setFilter('all',this)">All waves</button>
-  <button class="tab t-immediate" onclick="setFilter('immediate',this)">Immediate</button>
-  <button class="tab t-fast" onclick="setFilter('fast',this)">Fast</button>
-  <button class="tab t-moderate" onclick="setFilter('moderate',this)">Moderate</button>
-  <button class="tab t-robot" onclick="setFilter('robot',this)">Robot / AV wave</button>
-</div>
-
-<div class="content" id="content"></div>
-<div class="note" id="note"></div>
-
-<div class="section-divider">
-  <div class="section-divider-line"></div>
-  <div class="section-divider-label">Macro context &#8212; the four lines</div>
-  <div class="section-divider-line"></div>
-</div>
-
-<div class="chart-wrapper">
-  <div class="chart-title">AGI &#8594; ASI: The Four Lines That Explain Everything</div>
-  <div class="chart-subtitle">AI capability exits measurable scale at the singularity point. Note the 2026 economic threshold line — displacement accelerates here, before AGI, because cost and quality already justify replacement for most knowledge work.</div>
-  <div class="chart-legend">
-    <div class="chart-leg"><div class="chart-leg-line" style="background:#1D9E75"></div>AI Capability (exits chart at ASI)</div>
-    <div class="chart-leg"><div class="chart-leg-line" style="background:#378ADD"></div>AI Cost to Use</div>
-    <div class="chart-leg"><div class="chart-leg-line" style="background:#E24B4A"></div>Unemployment %</div>
-    <div class="chart-leg"><div class="chart-leg-line" style="background:#F472B6"></div>GDP Growth % YoY</div>
-  </div>
-  <div class="canvas-container">
-    <canvas id="capChart"></canvas>
-  </div>
-  <div class="chart-note">
-    Capability index uses log scale — even so the line exits the chart at the AGI&#8594;ASI event (~2028). Economic threshold crossed annotation (2026) marks where AI cost + quality already justifies replacement for most routine knowledge work — no AGI required. 20% unemployment = UBI forced threshold. GDP dip at singularity = danger zone before abundance.
-  </div>
-</div>
-
-<div class="changelog">
-  <div class="changelog-hdr">Changelog</div>
-
-  <div class="cl-version">
-    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span class="cl-tag">v6</span>
-      <span class="cl-title">Economic replacement threshold added + Anthropic RSI paper integrated</span>
-      <span class="cl-date">Jun 2026</span>
-    </div>
-    <div class="cl-body open">
-      <div class="cl-item"><b>Economic Replacement Threshold section:</b> visualizes the breaking point where AI cost + quality justifies replacement without AGI. Human fully loaded $65-120k/year vs AI $20-500/month. 54x-500x cost ratio. Quality already 85-95% on routine tasks. Threshold already crossed for 60%+ of knowledge work.</div>
-      <div class="cl-item"><b>Anthropic task horizon chart added:</b> tracks AI task completion time doubling every 4 months per Anthropic Institute paper. 4 min (2024) to 12 hours (2026) to days (late 2026) to weeks (2027) to unlimited (2028 AGI). This covers the full scope of most white collar jobs before AGI arrives.</div>
-      <div class="cl-item"><b>52x stat integrated:</b> Claude Mythos Preview optimizing training code at 52x vs ~3x a year prior. Engineers shipping 8x more code. 80% of Anthropic's production code now written by Claude. Open-ended task success rate 76%, up 50 points in 6 months.</div>
-      <div class="cl-item"><b>Chart updated:</b> economic threshold annotation added at 2026. AGI modal year moved to 2028. Chart now shows the pre-AGI displacement acceleration clearly.</div>
-      <div class="cl-item"><b>Cost Ratio stat added:</b> shows 54x-500x monthly cost difference between human employee and AI equivalent.</div>
-      <div class="cl-item"><b>Key framing update:</b> displacement doesn't require AGI — it requires cost &lt; human AND quality &#8805; 70%. Both conditions already met for majority of routine knowledge work as of June 2026.</div>
+  <!-- SECTION 1: CONFIRMED -->
+  <div class="section-1">
+    <div class="section-tag"><div class="dot"></div>Confirmed — Real Data, June 2026</div>
+    <div class="fact-grid">
+      <div class="fact">
+        <div class="fact-num">15.1%</div>
+        <div class="fact-label">of US employment already has 50%+ of tasks automated</div>
+        <div class="fact-source">SHRM survey, 20,000+ workers, Mar 2026</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">88,000+</div>
+        <div class="fact-label">AI-attributed layoffs in 2026 YTD — exceeds all of 2025</div>
+        <div class="fact-source">Challenger, Gray & Christmas</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">400,000+</div>
+        <div class="fact-label">S&P 500 roles cut in past year — first annual decline since 2016</div>
+        <div class="fact-source">Company filings, 2026</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">~16,000/mo</div>
+        <div class="fact-label">jobs removed from payroll growth, AI-attributed</div>
+        <div class="fact-source">Goldman Sachs estimate</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">50-500x</div>
+        <div class="fact-label">monthly cost ratio: human employee vs. AI equivalent for routine tasks</div>
+        <div class="fact-source">Cost comparison, fully-loaded human cost vs. API/subscription cost</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">13,000+</div>
+        <div class="fact-label">humanoid robots shipped in 2025, real industrial deployments at BMW, Mercedes, Amazon, GXO</div>
+        <div class="fact-source">Industry shipment data</div>
+      </div>
     </div>
   </div>
 
-  <div class="cl-version">
-    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span class="cl-tag">v5</span>
-      <span class="cl-title">Mid/senior management modeled + cascade jobs visualized + accuracy fixes</span>
-      <span class="cl-date">Jun 2026</span>
+  <!-- ECONOMIC REPLACEMENT THRESHOLD -->
+  <div class="section-1" style="background:rgba(186,117,23,.06); border-color:rgba(186,117,23,.3); margin-bottom:1.5rem;">
+    <div class="section-tag" style="color:var(--orange)"><div class="dot" style="background:var(--orange);box-shadow:0 0 5px var(--orange)"></div>⚠ The Economic Replacement Threshold — Already Crossed</div>
+    <div class="fact-grid">
+      <div class="fact">
+        <div class="fact-num">$65k–$120k/yr</div>
+        <div class="fact-label">Human fully-loaded cost — $5,400-$10,000/month including benefits, overhead, HR, management, PTO, liability</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">$20–$500/mo</div>
+        <div class="fact-label">AI equivalent cost today — API usage + subscription. Dropping ~50% every 12 months, approaching zero.</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">~70% of human</div>
+        <div class="fact-label">Quality threshold for replacement — once AI does 70% of a job's tasks adequately, the remaining 30% gets absorbed or restructured</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">85–95%</div>
+        <div class="fact-label">Current AI quality on routine tasks — already superhuman on many individual subtasks</div>
+        <div class="fact-source">Anthropic: 76% success on open-ended tasks May 2026, up 50 pts in 6 months</div>
+      </div>
     </div>
-    <div class="cl-body">
-      <div class="cl-item"><b>New sector — Mid &amp; Senior Management:</b> ~3.8M jobs. Middle managers, operations managers, directors, VPs, department heads.</div>
-      <div class="cl-item"><b>Cascade Lost stat added:</b> indirect spending collapse jobs (direct x 0.55)</div>
-      <div class="cl-item"><b>Finance:</b> insurance underwriters, loan processors, stockbrokers</div>
-      <div class="cl-item"><b>Healthcare:</b> medical scribes, veterinary technicians, OT assistants</div>
-      <div class="cl-item"><b>Government:</b> 911 dispatchers, court clerks, customs agents</div>
-      <div class="cl-item"><b>Education:</b> academic research assistants (500k)</div>
-      <div class="cl-item"><b>Accuracy fixes:</b> school bus drivers 68%→38%, dentists 46%→22%</div>
+    <div style="margin-top:.9rem; padding:10px 13px; background:rgba(226,75,74,.08); border:1px solid rgba(226,75,74,.25); border-radius:6px; font-size:11.5px; color:#CC9090; line-height:1.7;">
+      The replacement decision doesn't require AGI. It requires: AI cost &lt; human cost <b>AND</b> quality ≥ 70%. Both conditions are already met for a large share of routine knowledge work. The displacement already happening with today's imperfect AI is the evidence for that — not a projection. AGI would remove most of the remaining exceptions on top of this, which is what Section 3 below reasons about.
     </div>
   </div>
 
-  <div class="cl-version">
-    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span class="cl-tag">v4</span>
-      <span class="cl-title">Full economy coverage — 2 new sectors, 40+ new jobs</span>
-      <span class="cl-date">Jun 2026</span>
-    </div>
-    <div class="cl-body">
-      <div class="cl-item">Transportation &amp; AV sector. Engineering &amp; Technical sector. 40+ new roles across all sectors.</div>
-    </div>
+  <!-- SECTION 2: CAPABILITY GAP -->
+  <div class="section-2">
+    <div class="section-tag" style="color:var(--blue)"><div class="dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></div>Theoretical Capability vs. Observed Usage — This Is the Scale</div>
+    <p style="font-size:11.5px;color:var(--text2);line-height:1.6;">Anthropic's own published data (Jun 2026): the share of job tasks AI could theoretically perform is large across nearly every category. Actual measured usage is far smaller — but the gap is what's closing, not whether it exists.</p>
+    <div class="cap-bars" id="capBars"></div>
+    <div class="cap-note">Blue = theoretical task coverage (AI could do this). Green = observed actual usage today — this is real, measured data, not a projection. The size of the blue bars is real and confirmed. The speed at which green catches up to blue is the genuinely uncertain part — that's what Section 3 below is reasoning about, not measuring.</div>
   </div>
 
-  <div class="cl-version">
-    <div class="cl-version-hdr" onclick="this.nextElementSibling.classList.toggle('open')">
-      <span class="cl-tag">v1–v3</span>
-      <span class="cl-title">Initial release through split multiplier system</span>
-      <span class="cl-date">Jun 2026</span>
-    </div>
-    <div class="cl-body">
-      <div class="cl-item">v1: Initial release, 12 sectors, 80+ roles, four-line macro chart</div>
-      <div class="cl-item">v2: 15 new job categories, multiplier reframe</div>
-      <div class="cl-item">v3: Split multiplier (Wave 1 ÷5.0, Wave 2 ÷1.5), "To Run Economy" stat</div>
-    </div>
+  <!-- SECTION 3: PROJECTED SCENARIOS -->
+  <div class="section-3-header">
+    <div class="warn-tag"><div class="dot"></div>Projected Scenario — Not a Calculation</div>
+    <p class="warn-text">Everything below is a reasoned estimate built from the confirmed data above, factored against a 60% probability of AGI arriving by 2028 (Anthropic's own public estimate). It is not a model with verified inputs. Treat these as plausible ranges to think with, not numbers to plan finances around beyond what you're already doing.</p>
   </div>
+
+  <div class="toggle-row">
+    <button class="toggle-btn active-wc" id="btnWC" onclick="showScenario('wc')">White Collar</button>
+    <button class="toggle-btn" id="btnBC" onclick="showScenario('bc')">Blue Collar</button>
+  </div>
+
+  <div id="wcScenario" class="scenario-content shown"></div>
+  <div id="bcScenario" class="scenario-content"></div>
+
+  <!-- SECTION 4: UNEMPLOYMENT / UBI -->
+  <div class="section-4">
+    <div class="section-tag" style="color:var(--red)"><div class="dot" style="background:var(--red);box-shadow:0 0 5px var(--red)"></div>Combined Effective Unemployment & UBI Passage Probability — Projected</div>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:.9rem;">Blends both curves above plus cascade spending effects. UBI probability reflects political/economic pressure reasoning, not legislative tracking.</p>
+    <div id="ubiTable"></div>
+  </div>
+
+  <div class="footer-note">
+    <b>How to read this whole page:</b> the green section is real and sourced — that already happened, no debate needed. The blue capability section is also real and sourced — that gap exists today, measured by Anthropic itself. Everything in red is reasoning under genuine uncertainty: defensible, built from real signals, factoring in a stated AGI probability — but still a story about the future, not a record of it. The honest position is "the direction is very likely right, the exact year is a real guess." Both halves of that sentence matter.
+  </div>
+
+  <!-- ORIGINAL RESEARCH NOTES — carried over from earlier versions -->
+  <div class="section-2" style="margin-top:2rem;">
+    <div class="section-tag" style="color:var(--orange)"><div class="dot" style="background:var(--orange);box-shadow:0 0 5px var(--orange)"></div>Original Research Notes — Anthropic RSI Paper, Jun 2026</div>
+    <div class="fact-grid">
+      <div class="fact">
+        <div class="fact-num">52x</div>
+        <div class="fact-label">Claude Mythos Preview training-code optimization speedup, vs ~3x a year prior</div>
+        <div class="fact-source">Anthropic RSI paper, Jun 2026</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">80%</div>
+        <div class="fact-label">of Anthropic's own production code now written by Claude</div>
+        <div class="fact-source">Anthropic, Jun 2026</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">76%</div>
+        <div class="fact-label">success rate on open-ended tasks, May 2026 — up 50 points in 6 months</div>
+        <div class="fact-source">Anthropic Institute</div>
+      </div>
+      <div class="fact">
+        <div class="fact-num">4min → 12hr</div>
+        <div class="fact-label">AI task time horizon: Mar 2024 to Jun 2026 — doubling roughly every 4 months</div>
+        <div class="fact-source">"When AI Builds Itself," Anthropic Institute</div>
+      </div>
+    </div>
+    <p class="cap-note">These are the source numbers the original version of this tracker was built around. They're real and sourced — they describe AI capability trajectory, not job-loss timelines. The leap from "capability is compounding this fast" to "therefore X% of job Y is gone by month Z" is the part that needed separating out, which is what Sections 3 and 4 above do explicitly.</p>
+  </div>
+
+  <!-- CHANGELOG -->
+  <div class="footer-note" style="margin-top:1.5rem;">
+    <b>Version history:</b><br><br>
+    <b>v7 (this version):</b> Restructured to separate confirmed data, real capability-gap data, and projected scenarios into distinct labeled sections. Replaced job-title-specific percentage estimates with category-level ranges explicitly tied to stated AGI probability. Added UBI passage probability table built from the same reasoning. Carried forward original RSI research notes for reference.<br><br>
+    <b>v6:</b> Economic replacement threshold section added (human cost vs AI cost). Anthropic task horizon chart added. 52x RSI stat integrated. Chart updated with 2026 threshold + 2028 AGI annotations.<br><br>
+    <b>v5:</b> Mid/senior management sector added (~3.8M). Cascade jobs stat added (direct × 0.55). Finance, healthcare, government, education sectors expanded. Accuracy fixes to several category estimates.<br><br>
+    <b>v4:</b> Full economy coverage — Transportation/AV and Engineering/Technical sectors added, 40+ new roles across all sectors.<br><br>
+    <b>v1-v3:</b> Initial release (12 sectors, 80+ roles, four-line macro chart) through split multiplier system (Wave 1 ÷5.0, Wave 2 ÷1.5) and "jobs needed to run economy" framing.
+  </div>
+
 </div>
 
 <script>
-const sectors = [
-  {
-    name: "Mid & Senior Management",
-    jobs: [
-      {n:"Middle managers & team supervisors",lost:1.2,pct:88,speed:"fast"},
-      {n:"Operations managers",lost:0.8,pct:85,speed:"fast"},
-      {n:"Program & portfolio managers (mid)",lost:0.4,pct:87,speed:"fast"},
-      {n:"Directors (non-C-suite)",lost:0.7,pct:82,speed:"fast"},
-      {n:"VPs (non-executive function)",lost:0.4,pct:79,speed:"fast"},
-      {n:"Department heads (report synthesis)",lost:0.3,pct:84,speed:"fast"},
-    ]
-  },
-  {
-    name: "Knowledge Work & Office",
-    jobs: [
-      {n:"Data entry & processing clerks",lost:3.8,pct:97,speed:"immediate"},
-      {n:"Customer service representatives",lost:2.9,pct:95,speed:"immediate"},
-      {n:"Administrative assistants",lost:3.4,pct:91,speed:"immediate"},
-      {n:"Bookkeeping & accounting clerks",lost:2.1,pct:93,speed:"immediate"},
-      {n:"Payroll clerks",lost:0.6,pct:96,speed:"immediate"},
-      {n:"HR generalists & recruiters",lost:1.4,pct:91,speed:"immediate"},
-      {n:"Paralegals & legal assistants",lost:0.4,pct:94,speed:"immediate"},
-      {n:"Medical billing & coders",lost:0.5,pct:92,speed:"immediate"},
-      {n:"Insurance claims processors",lost:0.7,pct:90,speed:"immediate"},
-      {n:"Technical writers",lost:0.5,pct:97,speed:"immediate"},
-      {n:"Court reporters & stenographers",lost:0.05,pct:98,speed:"immediate"},
-      {n:"Business intelligence analysts",lost:0.4,pct:95,speed:"immediate"},
-      {n:"Procurement & purchasing clerks",lost:0.8,pct:94,speed:"immediate"},
-      {n:"Telemarketers",lost:0.2,pct:99,speed:"immediate"},
-      {n:"Bill & account collectors",lost:0.2,pct:95,speed:"immediate"},
-      {n:"Operations research analysts",lost:0.1,pct:93,speed:"immediate"},
-      {n:"Grant writers",lost:0.05,pct:91,speed:"immediate"},
-      {n:"Medical assistants (administrative)",lost:0.7,pct:88,speed:"immediate"},
-      {n:"Health information technicians",lost:0.1,pct:91,speed:"immediate"},
-      {n:"Financial analysts",lost:1.2,pct:86,speed:"fast"},
-      {n:"Loan officers & underwriters",lost:0.5,pct:88,speed:"fast"},
-      {n:"Market research analysts",lost:0.5,pct:86,speed:"fast"},
-      {n:"Compliance officers",lost:0.3,pct:81,speed:"fast"},
-      {n:"Project managers (junior/mid)",lost:0.9,pct:85,speed:"fast"},
-      {n:"Business analysts",lost:0.6,pct:87,speed:"fast"},
-      {n:"Insurance adjusters",lost:0.3,pct:83,speed:"fast"},
-      {n:"Supply chain analysts",lost:0.4,pct:88,speed:"fast"},
-      {n:"Public relations specialists",lost:0.2,pct:82,speed:"fast"},
-      {n:"Management analysts",lost:0.8,pct:83,speed:"fast"},
-      {n:"Budget analysts",lost:0.05,pct:87,speed:"fast"},
-      {n:"Statisticians",lost:0.04,pct:85,speed:"fast"},
-      {n:"Credit analysts",lost:0.07,pct:84,speed:"fast"},
-    ]
-  },
-  {
-    name: "Software & Tech",
-    jobs: [
-      {n:"Junior & mid-level software developers",lost:2.1,pct:90,speed:"immediate"},
-      {n:"QA testers & manual reviewers",lost:0.4,pct:98,speed:"immediate"},
-      {n:"Data analysts",lost:0.8,pct:91,speed:"immediate"},
-      {n:"IT support & helpdesk",lost:0.9,pct:87,speed:"fast"},
-      {n:"Network administrators",lost:0.3,pct:74,speed:"fast"},
-      {n:"Senior software engineers",lost:0.9,pct:65,speed:"fast"},
-      {n:"DevOps engineers",lost:0.3,pct:66,speed:"fast"},
-      {n:"Cybersecurity analysts",lost:0.2,pct:51,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Media, Content, Creative & Marketing",
-    jobs: [
-      {n:"Copywriters & content writers",lost:0.7,pct:96,speed:"immediate"},
-      {n:"Graphic designers (commercial)",lost:0.5,pct:91,speed:"immediate"},
-      {n:"Social media managers",lost:0.3,pct:88,speed:"immediate"},
-      {n:"SEO specialists",lost:0.15,pct:94,speed:"immediate"},
-      {n:"Translators & interpreters",lost:0.15,pct:85,speed:"immediate"},
-      {n:"UX/UI designers (commercial)",lost:0.2,pct:92,speed:"immediate"},
-      {n:"Stock photographers",lost:0.1,pct:97,speed:"immediate"},
-      {n:"Journalists & reporters",lost:0.2,pct:84,speed:"fast"},
-      {n:"Video editors (routine)",lost:0.2,pct:82,speed:"fast"},
-      {n:"Ad buyers & campaign managers",lost:0.2,pct:79,speed:"fast"},
-      {n:"Commercial animators (routine)",lost:0.1,pct:82,speed:"fast"},
-      {n:"Voice actors (commercial/routine)",lost:0.05,pct:79,speed:"fast"},
-      {n:"Fashion designers (mass market)",lost:0.1,pct:78,speed:"fast"},
-      {n:"Interior designers (commercial standard)",lost:0.1,pct:74,speed:"fast"},
-      {n:"Audio engineers (commercial/routine)",lost:0.05,pct:77,speed:"fast"},
-    ]
-  },
-  {
-    name: "Finance & Banking",
-    jobs: [
-      {n:"Bank tellers",lost:0.3,pct:92,speed:"immediate"},
-      {n:"Tax preparers",lost:0.3,pct:95,speed:"immediate"},
-      {n:"Insurance underwriters",lost:0.4,pct:93,speed:"immediate"},
-      {n:"Loan processors",lost:0.3,pct:95,speed:"immediate"},
-      {n:"Accountants & auditors",lost:1.1,pct:87,speed:"fast"},
-      {n:"Financial advisors (mass market)",lost:0.4,pct:80,speed:"fast"},
-      {n:"Insurance agents (standard lines)",lost:0.4,pct:77,speed:"fast"},
-      {n:"Mortgage brokers",lost:0.08,pct:79,speed:"fast"},
-      {n:"Title examiners & escrow officers",lost:0.1,pct:86,speed:"fast"},
-      {n:"Stockbrokers & securities sales reps",lost:0.2,pct:78,speed:"fast"},
-      {n:"Stock & commodities traders",lost:0.15,pct:72,speed:"moderate"},
-      {n:"Actuaries",lost:0.07,pct:83,speed:"moderate"},
-      {n:"Property appraisers",lost:0.1,pct:79,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Transportation & Autonomous Vehicles",
-    jobs: [
-      {n:"Toll booth operators",lost:0.03,pct:99,speed:"immediate"},
-      {n:"Taxi & rideshare drivers (Uber/Lyft)",lost:0.4,pct:94,speed:"fast"},
-      {n:"Parking lot attendants & valets",lost:0.3,pct:92,speed:"fast"},
-      {n:"Chauffeurs & limousine drivers",lost:0.05,pct:85,speed:"fast"},
-      {n:"Last-mile delivery van drivers",lost:0.3,pct:88,speed:"fast"},
-      {n:"City bus drivers",lost:0.17,pct:71,speed:"moderate"},
-      {n:"School bus drivers",lost:0.5,pct:38,speed:"moderate"},
-      {n:"Subway & light rail operators",lost:0.05,pct:74,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Engineering & Technical",
-    jobs: [
-      {n:"CAD drafters",lost:0.2,pct:94,speed:"immediate"},
-      {n:"Industrial engineers",lost:0.3,pct:74,speed:"fast"},
-      {n:"Mechanical engineers (routine analysis)",lost:0.15,pct:69,speed:"fast"},
-      {n:"Electrical engineers (routine)",lost:0.12,pct:66,speed:"fast"},
-      {n:"Cost estimators",lost:0.2,pct:82,speed:"fast"},
-      {n:"Building inspectors",lost:0.1,pct:69,speed:"moderate"},
-      {n:"Environmental engineers (routine)",lost:0.05,pct:61,speed:"moderate"},
-      {n:"Surveyors",lost:0.05,pct:64,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Food Service & Hospitality",
-    jobs: [
-      {n:"Hotel front desk & reservations",lost:0.5,pct:82,speed:"immediate"},
-      {n:"Fast food & counter service workers",lost:3.2,pct:84,speed:"fast"},
-      {n:"Chain restaurant line cooks",lost:1.4,pct:77,speed:"fast"},
-      {n:"Casual dining waitstaff (chain)",lost:2.1,pct:71,speed:"fast"},
-      {n:"Bartenders (chain/volume)",lost:0.4,pct:58,speed:"moderate"},
-      {n:"Fine dining waitstaff",lost:0.1,pct:19,speed:"moderate"},
-      {n:"Artisan & creative chefs",lost:0.05,pct:9,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Healthcare (Cognitive Roles)",
-    jobs: [
-      {n:"Medical transcriptionists",lost:0.08,pct:98,speed:"immediate"},
-      {n:"Clinical documentation specialists",lost:0.1,pct:95,speed:"immediate"},
-      {n:"Medical scribes",lost:0.1,pct:97,speed:"immediate"},
-      {n:"Radiologists & diagnostic imaging",lost:0.18,pct:88,speed:"fast"},
-      {n:"Pathologists",lost:0.06,pct:82,speed:"fast"},
-      {n:"Pharmacy technicians (dispensing)",lost:0.2,pct:74,speed:"fast"},
-      {n:"Mental health therapists (mild-moderate)",lost:0.3,pct:61,speed:"fast"},
-      {n:"Veterinary technicians",lost:0.1,pct:71,speed:"fast"},
-      {n:"Sonographers & ultrasound techs",lost:0.07,pct:72,speed:"moderate"},
-      {n:"Optometrists (diagnostic function)",lost:0.04,pct:69,speed:"moderate"},
-      {n:"Pharmacists (dispensing function)",lost:0.15,pct:56,speed:"moderate"},
-      {n:"Dermatologists (diagnostic function)",lost:0.05,pct:72,speed:"moderate"},
-      {n:"Lab technicians",lost:0.3,pct:68,speed:"moderate"},
-      {n:"Occupational therapy assistants",lost:0.1,pct:66,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Legal & Professional Services",
-    jobs: [
-      {n:"Document review lawyers",lost:0.15,pct:94,speed:"immediate"},
-      {n:"Legal researchers",lost:0.1,pct:91,speed:"immediate"},
-      {n:"Management consultants (junior)",lost:0.3,pct:85,speed:"fast"},
-      {n:"Architects (routine drafting)",lost:0.12,pct:77,speed:"fast"},
-      {n:"Civil engineers (routine analysis)",lost:0.15,pct:64,speed:"moderate"},
-      {n:"Dentists (routine cleaning & basic)",lost:0.1,pct:22,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Education & Training",
-    jobs: [
-      {n:"Test prep & tutoring",lost:0.25,pct:91,speed:"immediate"},
-      {n:"Online course instructors",lost:0.4,pct:89,speed:"fast"},
-      {n:"Corporate trainers",lost:0.3,pct:86,speed:"fast"},
-      {n:"Academic advisors",lost:0.15,pct:85,speed:"fast"},
-      {n:"Academic research assistants",lost:0.5,pct:88,speed:"fast"},
-      {n:"K-12 teachers (standardized content)",lost:0.5,pct:34,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Retail & Customer-Facing",
-    jobs: [
-      {n:"Call center agents",lost:1.4,pct:94,speed:"immediate"},
-      {n:"Cashiers & checkout staff",lost:1.8,pct:76,speed:"fast"},
-      {n:"Sales representatives (inside)",lost:0.9,pct:81,speed:"fast"},
-      {n:"Travel agents",lost:0.06,pct:90,speed:"fast"},
-      {n:"Outside sales representatives",lost:0.4,pct:71,speed:"fast"},
-      {n:"Real estate agents (standard)",lost:0.3,pct:64,speed:"moderate"},
-      {n:"Property managers (routine)",lost:0.2,pct:61,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Logistics & Warehousing",
-    jobs: [
-      {n:"Dispatchers & logistics coordinators",lost:0.4,pct:89,speed:"immediate"},
-      {n:"Warehouse order pickers (non-robotic)",lost:0.9,pct:58,speed:"fast"},
-      {n:"Truck & long-haul drivers",lost:1.2,pct:36,speed:"moderate"},
-      {n:"Postal & mail workers",lost:0.2,pct:51,speed:"moderate"},
-      {n:"Airline pilots (regulatory delay)",lost:0.1,pct:24,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Government & Public Sector",
-    jobs: [
-      {n:"Government administrative clerks",lost:1.1,pct:82,speed:"fast"},
-      {n:"DMV & permit processors",lost:0.2,pct:91,speed:"fast"},
-      {n:"Tax & revenue agents",lost:0.15,pct:84,speed:"fast"},
-      {n:"911 dispatchers & emergency call operators",lost:0.1,pct:82,speed:"fast"},
-      {n:"Court clerks & judicial support staff",lost:0.15,pct:79,speed:"fast"},
-      {n:"Benefits & welfare case workers",lost:0.4,pct:75,speed:"moderate"},
-      {n:"Customs & border processing agents",lost:0.05,pct:64,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Personal Services & Wellness",
-    jobs: [
-      {n:"Personal trainers (programming only)",lost:0.2,pct:73,speed:"fast"},
-      {n:"Security guards (monitoring roles)",lost:0.6,pct:69,speed:"fast"},
-      {n:"Life & career coaches",lost:0.15,pct:65,speed:"fast"},
-      {n:"Financial planners (basic)",lost:0.2,pct:71,speed:"fast"},
-      {n:"Veterinarians (diagnostic function)",lost:0.08,pct:51,speed:"moderate"},
-    ]
-  },
-  {
-    name: "Robot & AV Wave — Month 6-18",
-    jobs: [
-      {n:"Janitors & commercial cleaners",lost:2.8,pct:72,speed:"robot"},
-      {n:"Home health aides & personal care",lost:3.1,pct:61,speed:"robot"},
-      {n:"Agricultural & farm workers",lost:2.4,pct:58,speed:"robot"},
-      {n:"Construction laborers (routine)",lost:2.2,pct:49,speed:"robot"},
-      {n:"Manufacturing assembly workers",lost:2.6,pct:66,speed:"robot"},
-      {n:"Retail stock & shelf workers",lost:1.4,pct:71,speed:"robot"},
-      {n:"Package handlers (FedEx/UPS/Amazon)",lost:1.2,pct:63,speed:"robot"},
-      {n:"Laundry & dry cleaning workers",lost:0.3,pct:77,speed:"robot"},
-      {n:"Grounds maintenance & landscaping",lost:0.9,pct:54,speed:"robot"},
-      {n:"Moving & heavy labor crews",lost:0.4,pct:58,speed:"robot"},
-      {n:"Hotel housekeeping",lost:0.5,pct:76,speed:"robot"},
-      {n:"Forklift operators",lost:0.5,pct:81,speed:"robot"},
-      {n:"CNC machine operators",lost:0.3,pct:74,speed:"robot"},
-      {n:"Auto mechanics (routine diagnostics)",lost:0.3,pct:58,speed:"robot"},
-      {n:"Car wash attendants",lost:0.1,pct:84,speed:"robot"},
-      {n:"Food runners & bus boys",lost:0.3,pct:73,speed:"robot"},
-      {n:"Phlebotomists",lost:0.15,pct:71,speed:"robot"},
-      {n:"Dental hygienists",lost:0.2,pct:63,speed:"robot"},
-    ]
-  }
+// Capability radar data — approximating Anthropic's published categories, theoretical vs observed
+const capData = [
+  {name:"Office & admin", theory:92, observed:18},
+  {name:"Legal", theory:88, observed:12},
+  {name:"Computer & math", theory:90, observed:22},
+  {name:"Business & finance", theory:91, observed:16},
+  {name:"Management", theory:85, observed:10},
+  {name:"Arts & media", theory:80, observed:14},
+  {name:"Education & library", theory:78, observed:9},
+  {name:"Sales", theory:75, observed:11},
+  {name:"Architecture & engineering", theory:72, observed:8},
+  {name:"Healthcare practitioners", theory:55, observed:6},
+  {name:"Production", theory:35, observed:4},
+  {name:"Construction", theory:18, observed:2},
+  {name:"Personal care", theory:15, observed:2},
 ];
 
-let filter = 'all';
+const capBars = document.getElementById('capBars');
+capData.forEach(d => {
+  const row = document.createElement('div');
+  row.className = 'cap-row';
+  row.innerHTML = `
+    <div class="cap-name">${d.name}</div>
+    <div class="cap-track">
+      <div class="cap-fill-theory" style="width:${d.theory}%"></div>
+      <div class="cap-fill-observed" style="width:${d.observed}%"></div>
+    </div>
+    <div class="cap-pct">${d.theory}% / ${d.observed}%</div>
+  `;
+  capBars.appendChild(row);
+});
 
-function setFilter(f, btn) {
-  filter = f;
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
+// White collar scenario
+const wcData = [
+  {yr:2026, low:5, high:8, modal:false, desc:"Mostly hiring freezes and attrition, not dramatic layoffs. Routine task automation already real per SHRM data above."},
+  {yr:2027, low:15, high:20, modal:false, desc:"Most likely window for a single large, visible, explicitly AI-attributed layoff announcement. Mid-level knowledge work sees real reduction."},
+  {yr:2028, low:22, high:38, modal:true, desc:"Wide range reflects AGI uncertainty: lower end (~22-25%) if AGI does not arrive this year, upper end (~35-38%) if it does, per your 60% weighting."},
+  {yr:2029, low:32, high:50, modal:false, desc:"If AGI landed in 2028, this is year-one compounding via recursive improvement — cognitive work has no hardware deployment lag."},
+  {yr:2030, low:45, high:65, modal:false, desc:"Senior/oversight roles begin compressing as AI agents grow capable of self-verification, eroding the human-oversight premium."},
+  {yr:"2031-2035", low:55, high:80, modal:false, desc:"Continued climb, slowing as it nears categories with strong licensing, legal accountability, or human-trust requirements."},
+];
 
-function render() {
-  const content = document.getElementById('content');
-  content.innerHTML = '';
-  let w1 = 0, w2 = 0, imm = 0;
+const bcData = [
+  {yr:2026, low:0, high:1, modal:false, desc:"Named pilots only — BMW, Mercedes, Amazon, GXO. Real but narrow, concentrated in auto manufacturing and logistics."},
+  {yr:2027, low:3, high:5, modal:false, desc:"Production scaling continues across more companies. Still mostly warehouse/logistics/auto specific, not broad cross-sector yet."},
+  {yr:2028, low:8, high:15, modal:true, desc:"AGI weighting matters here too — capable systems can optimize robot control software and manufacturing logistics faster than human engineering alone."},
+  {yr:2029, low:18, high:28, modal:false, desc:"Post-AGI physical effects: recursive improvement applied to hardware/software design, key bottlenecks (chip fab, materials) starting to close."},
+  {yr:2030, low:30, high:42, modal:false, desc:"Steepest part of the curve — consistent with how automation waves typically move once a threshold is crossed: slow start, fast middle."},
+  {yr:"2031-2036", low:45, high:70, modal:false, desc:"Continues climbing, slowing as it nears skilled trades requiring judgment in unpredictable environments and strong licensing protections."},
+];
 
-  sectors.forEach(sector => {
-    const jobs = filter === 'all' ? sector.jobs : sector.jobs.filter(j => j.speed === filter);
-    if (!jobs.length) return;
-
-    const tot = jobs.reduce((a,j) => a + j.lost, 0);
-    jobs.forEach(j => {
-      if (j.speed === 'robot') w2 += j.lost;
-      else w1 += j.lost;
-      if (j.speed === 'immediate') imm += j.lost;
-    });
-
-    const div = document.createElement('div');
-    div.className = 'sector';
-    let html = '<div class="sector-hdr"><span class="sector-name">' + sector.name + '</span><span class="sector-tot">' + tot.toFixed(1) + 'M</span></div>';
-
-    jobs.forEach((j, i) => {
-      const labels = {immediate:'Day 1-30', fast:'Mo 1-4', moderate:'Mo 4-9', robot:'Mo 6-18 Robot'};
-      const barW = Math.min(Math.round(j.lost / 4 * 100), 100);
-      html += '<div class="job-row" style="animation-delay:' + (i*20) + 'ms">' +
-        '<span class="job-name">' + j.n + '</span>' +
-        '<span class="badge badge-' + j.speed + '">' + labels[j.speed] + '</span>' +
-        '<div class="bar-wrap"><div class="bar-bg"><div class="bar-fill bar-' + j.speed + '" style="width:' + barW + '%"></div></div></div>' +
-        '<span class="job-pct">' + j.pct + '%</span>' +
-        '<span class="job-lost">' + j.lost.toFixed(1) + 'M</span>' +
-        '</div>';
-    });
-
-    div.innerHTML = html;
-    content.appendChild(div);
+function buildScenario(data, colorClass) {
+  let html = '';
+  data.forEach(d => {
+    const widthLow = d.low;
+    const widthHigh = d.high;
+    html += `
+      <div class="year-card">
+        <div class="year-card-top">
+          <span class="year-num">${d.yr}</span>
+          <span class="year-range ${colorClass}">${d.low}-${d.high}%</span>
+          ${d.modal ? '<span class="year-modal-tag">AGI WEIGHTED — 60% BY 2028</span>' : ''}
+        </div>
+        <div class="year-bar-track">
+          <div class="year-bar-fill ${colorClass}" style="width:${widthHigh}%; opacity:0.35;"></div>
+          <div class="year-bar-fill ${colorClass}" style="width:${widthLow}%; margin-top:-8px;"></div>
+        </div>
+        <div class="year-desc">${d.desc}</div>
+      </div>
+    `;
   });
-
-  const total = w1 + w2;
-  const cascadeLost = total * 0.55;
-  const totalEffective = total + cascadeLost;
-  const multi1 = w1 / 5.0;
-  const multi2 = w2 / 1.5;
-  const multiTotal = multi1 + multi2;
-  const pct = (total / 160 * 100);
-
-  document.getElementById('s-w1').textContent = w1.toFixed(1) + 'M';
-  document.getElementById('s-w2').textContent = w2.toFixed(1) + 'M';
-  document.getElementById('s-total').textContent = total.toFixed(1) + 'M';
-  document.getElementById('s-cascade').textContent = cascadeLost.toFixed(1) + 'M';
-  document.getElementById('s-effective').textContent = totalEffective.toFixed(1) + 'M';
-  document.getElementById('s-multi1').textContent = multi1.toFixed(1) + 'M';
-  document.getElementById('s-multi').textContent = multiTotal.toFixed(1) + 'M';
-  document.getElementById('s-pct').textContent = pct.toFixed(0) + '%';
-  document.getElementById('s-imm').textContent = imm.toFixed(1) + 'M';
-
-  document.getElementById('note').innerHTML =
-    '<b>What this models:</b> Displacement from ASI deployment day. The economic replacement threshold (AI cost + quality justifying replacement) is already crossed for most routine knowledge work before AGI even arrives. AGI removes the remaining exceptions simultaneously on day one.<br><br>' +
-    '<b>The non-replacement mechanism:</b> Companies do not need to fire anyone. One person with AGI does the work of 5+, so the company never posts the job listing when someone leaves. Headcount collapses through attrition and compression, not headlines.<br><br>' +
-    '<b>The compounding sideways mechanism:</b> Once AI automates 50% of a job, the remaining 40% becomes either cheaper to automate or consolidates into fewer higher-skilled roles. Structural collapse of entire job categories within 18-24 months — not gradual attrition. (Art Voloshyn, AI engineer, LinkedIn Jun 2026)<br><br>' +
-    '<b>Cascade jobs:</b> Every direct job lost eliminates ~0.55 additional downstream jobs within 18 months. Total Effective = Direct + Cascade = the real human cost.<br><br>' +
-    '<b>What this does not model:</b> Jobs that survive and increase in value — live officiating, coaching, physical presence roles, creative arts, genuine human connection. These compress in supply and rise in price as the automated world creates demand for authentically human experiences. 160M workforce baseline.';
+  return html;
 }
 
-render();
-</script>
+document.getElementById('wcScenario').innerHTML = buildScenario(wcData, 'wc');
+document.getElementById('bcScenario').innerHTML = buildScenario(bcData, 'bc');
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
-<script>
-const capLabels = ['2024','2025','2026','2027','2028','2029','2029.5','2030','2031','2032','2033','2034'];
-const capability   = [2, 4, 8, 18, 45, 180, null, null, null, null, null, null];
-const aiCost       = [95, 82, 65, 45, 22, 8, 3, 1.5, 0.8, 0.6, 0.5, 0.5];
-const unemployment = [3.9, 4.2, 6.8, 11.5, 20, 31.5, 36, 38.2, 40.1, 38.5, 28, 18];
-const gdp          = [2.8, 2.9, 3.1, 3.4, 2.0, -1.5, 4.0, 12, 28, 45, 60, 72];
+function showScenario(which) {
+  document.getElementById('wcScenario').classList.toggle('shown', which === 'wc');
+  document.getElementById('bcScenario').classList.toggle('shown', which === 'bc');
+  document.getElementById('btnWC').classList.toggle('active-wc', which === 'wc');
+  document.getElementById('btnBC').classList.toggle('active-bc', which === 'bc');
+}
 
-Chart.register(window['chartjs-plugin-annotation']);
+// UBI / unemployment table
+const ubiData = [
+  {yr:2026, unemp:"5-6%", ubiProb:2, desc:"Baseline. Denial-phase dominant."},
+  {yr:2027, unemp:"9-12%", ubiProb:18, desc:"Threshold crossed, Lehman-style event most likely lands here."},
+  {yr:2028, unemp:"14-19%", ubiProb:38, desc:"Most likely single year — AGI weighting + unrest acceleration compounding."},
+  {yr:2029, unemp:"20-27%", ubiProb:24, desc:"Most likely overflow year if 2028 stalls politically."},
+  {yr:2030, unemp:"28-35%", ubiProb:12, desc:"Slower case — gridlock or delayed AGI timeline."},
+  {yr:"2031+", unemp:"varies", ubiProb:6, desc:"Slow case — diffuse crisis, no single forcing moment."},
+];
 
-new Chart(document.getElementById('capChart'), {
-  type: 'line',
-  data: {
-    labels: capLabels,
-    datasets: [
-      {
-        label: 'AI Capability',
-        data: capability,
-        borderColor: '#1D9E75',
-        backgroundColor: 'rgba(29,158,117,0.07)',
-        borderWidth: 3,
-        pointRadius: 4,
-        pointBackgroundColor: '#1D9E75',
-        fill: false,
-        tension: 0.3,
-        yAxisID: 'yLog',
-        spanGaps: false,
-      },
-      {
-        label: 'AI Cost to Use',
-        data: aiCost,
-        borderColor: '#378ADD',
-        borderWidth: 2.5,
-        pointRadius: 3,
-        pointBackgroundColor: '#378ADD',
-        fill: false,
-        tension: 0.4,
-        borderDash: [6,3],
-        yAxisID: 'yLog'
-      },
-      {
-        label: 'Unemployment %',
-        data: unemployment,
-        borderColor: '#E24B4A',
-        backgroundColor: 'rgba(226,75,74,0.08)',
-        borderWidth: 2,
-        pointRadius: 3,
-        pointBackgroundColor: '#E24B4A',
-        fill: true,
-        tension: 0.4,
-        yAxisID: 'y2'
-      },
-      {
-        label: 'GDP Growth %',
-        data: gdp,
-        borderColor: '#F472B6',
-        borderWidth: 2,
-        pointRadius: 3,
-        pointBackgroundColor: '#F472B6',
-        fill: false,
-        tension: 0.4,
-        borderDash: [3,2],
-        yAxisID: 'y2'
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#1C1C26',
-        borderColor: '#2A2A38',
-        borderWidth: 1,
-        titleColor: '#F0F0F5',
-        bodyColor: '#8888AA',
-        callbacks: {
-          label: function(ctx) {
-            if (ctx.datasetIndex === 0) return ctx.parsed.y != null ? ' Capability: ' + Math.round(ctx.parsed.y).toLocaleString() : ' Capability: OFF CHART (ASI)';
-            if (ctx.datasetIndex === 1) return ' AI cost: ' + (ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) : '--');
-            if (ctx.datasetIndex === 2) return ' Unemployment: ' + ctx.parsed.y + '%';
-            if (ctx.datasetIndex === 3) return ' GDP growth: ' + ctx.parsed.y + '% YoY';
-          }
-        }
-      },
-      annotation: {
-        annotations: {
-          thresholdCrossed: {
-            type: 'line', xMin: '2026', xMax: '2026',
-            borderColor: '#F0C040', borderWidth: 1.5, borderDash: [4,4],
-            label: {
-              display: true, content: 'Economic threshold crossed', position: 'start',
-              backgroundColor: 'rgba(240,192,64,0.9)', color: '#2A1800',
-              font: { size: 10, weight: '600' }, padding: { x: 6, y: 4 }, borderRadius: 4, yAdjust: 40
-            }
-          },
-          singularity: {
-            type: 'line', xMin: '2028', xMax: '2028',
-            borderColor: '#EF9F27', borderWidth: 2, borderDash: [4,4],
-            label: {
-              display: true, content: 'AGI -> ASI (modal 2028)', position: 'start',
-              backgroundColor: '#EF9F27', color: '#412402',
-              font: { size: 10, weight: '600' }, padding: { x: 6, y: 4 }, borderRadius: 4, yAdjust: -1
-            }
-          },
-          ubiLine: {
-            type: 'line', yMin: 20, yMax: 20, yScaleID: 'y2',
-            borderColor: 'rgba(226,75,74,0.6)', borderWidth: 1.5, borderDash: [3,3],
-            label: {
-              display: true, content: '20% -- UBI forced', position: 'end',
-              backgroundColor: 'rgba(226,75,74,0.85)', color: '#fff',
-              font: { size: 10, weight: '500' }, padding: { x: 5, y: 3 }, borderRadius: 4, xAdjust: -4
-            }
-          },
-          dangerZone: {
-            type: 'box', xMin: '2028', xMax: '2031',
-            backgroundColor: 'rgba(226,75,74,0.05)', borderColor: 'rgba(226,75,74,0.2)', borderWidth: 1,
-            label: {
-              display: true, content: ['danger zone', 'peak unemployment'],
-              font: { size: 9 }, color: '#E24B4A',
-              position: { x: 'center', y: 'center' }, yAdjust: -40
-            }
-          },
-          ubiBox: {
-            type: 'box', xMin: '2029', xMax: '2029.5',
-            backgroundColor: 'rgba(239,159,39,0.06)', borderColor: 'rgba(239,159,39,0.2)', borderWidth: 1,
-            label: {
-              display: true, content: 'UBI passes', font: { size: 9 }, color: '#BA7517',
-              position: { x: 'center', y: 'start' }, yAdjust: 40
-            }
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: '#555577', font: { size: 11 }, autoSkip: false, maxRotation: 45,
-          callback: function(val, i) { return capLabels[i] === '2029.5' ? '' : capLabels[i]; }
-        },
-        grid: { color: 'rgba(255,255,255,0.05)' }
-      },
-      yLog: {
-        type: 'logarithmic', position: 'left', min: 1, max: 200,
-        ticks: {
-          color: '#555577', font: { size: 10 },
-          callback: function(v) { return [1,5,10,50,100,200].includes(v) ? v : ''; }
-        },
-        grid: { color: 'rgba(255,255,255,0.05)' },
-        title: { display: true, text: 'capability / AI cost (log scale)', color: '#555577', font: { size: 10 } }
-      },
-      y2: {
-        position: 'right', min: -10, max: 80,
-        ticks: { color: '#555577', font: { size: 11 }, callback: function(v) { return v + '%'; } },
-        grid: { drawOnChartArea: false },
-        title: { display: true, text: 'unemployment % / GDP growth %', color: '#555577', font: { size: 10 } }
-      }
-    }
-  }
+const ubiTable = document.getElementById('ubiTable');
+ubiData.forEach(d => {
+  const row = document.createElement('div');
+  row.className = 'ubi-year';
+  row.innerHTML = `
+    <div class="ubi-yr-label">${d.yr}</div>
+    <div class="ubi-bar-track"><div class="ubi-bar-fill" style="width:${d.ubiProb*2.4}%"><span class="ubi-pct-label">${d.ubiProb}% chance</span></div></div>
+    <div class="ubi-desc">unemployment: ${d.unemp}<br>${d.desc}</div>
+  `;
+  ubiTable.appendChild(row);
 });
 </script>
 </body>
-</html>"""
-
-with open('/mnt/user-data/outputs/index.html', 'w') as f:
-    f.write(content)
-print("v6 written:", len(content), "chars")
+</html>
