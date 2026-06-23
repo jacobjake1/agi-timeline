@@ -1,6 +1,6 @@
 # AGI Timeline — Job Displacement Scenario Model
 
-**Live site:** [jacobjake1.github.io/agi-timeline](https://jacobjake1.github.io/AI-Displacement-Tracker/)
+**Live site:** [jacobjake1.github.io/AI-Displacement-Tracker](https://jacobjake1.github.io/AI-Displacement-Tracker/)
 
 An interactive scenario model exploring what US job displacement could look like after AGI/ASI-level capability is publicly deployed. This is a reasoned "what if" built from real signals — not a forecast, not a calculation with verified inputs. Every number below is either sourced (marked) or an assumption I chose to make the model run (also marked). Treat it as a way to think about scale and sequencing, not a prediction to plan around.
 
